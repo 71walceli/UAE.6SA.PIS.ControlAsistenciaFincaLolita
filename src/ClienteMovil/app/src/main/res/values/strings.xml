@@ -5,5 +5,5 @@
     <string name="graciasPorRegistrarAsistencia">¡Gracias por regisrrar su asistencia!</string>
     <string name="ustedRegistroHora">Usted se registró hoy a las %1s.</string>
     <string name="LlegoTemprano">Ha llegado %1s minutos antes.</string>
-    <string name="LlegoTemprano">Ha llegado con %1s minutos de atraso.</string>
+    <string name="LlegoTarde">Ha llegado con %1s minutos de atraso.</string>
 </resources>
