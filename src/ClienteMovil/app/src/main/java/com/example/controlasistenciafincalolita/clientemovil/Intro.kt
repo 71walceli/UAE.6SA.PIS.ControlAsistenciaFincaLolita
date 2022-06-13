@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.TypedValue
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -16,10 +17,22 @@ class Intro : AppCompatActivity() {
             // TODO Cambiar color de fondo según estado...
             if (value == true) {
                 findViewById<TextView>(R.id.iconoCorrectoError).text = "\uf00c"
+                findViewById<TextView>(R.id.iconoCorrectoError).setTextColor(
+                    resources.getColor(R.color.correcto))
+                findViewById<TextView>(R.id.iconoUsuario).setTextColor(
+                    resources.getColor(R.color.correcto))
             } else if (value == false) {
                 findViewById<TextView>(R.id.iconoCorrectoError).text = "\uf00d"
+                findViewById<TextView>(R.id.iconoCorrectoError).setTextColor(
+                    resources.getColor(R.color.error))
+                findViewById<TextView>(R.id.iconoUsuario).setTextColor(
+                    resources.getColor(R.color.error))
             } else {
                 findViewById<TextView>(R.id.iconoCorrectoError).text = "\uf013"
+                findViewById<TextView>(R.id.iconoCorrectoError).setTextColor(
+                    resources.getColor(R.color.black))
+                findViewById<TextView>(R.id.iconoUsuario).setTextColor(
+                    resources.getColor(R.color.black))
             }
             field = value
         }
