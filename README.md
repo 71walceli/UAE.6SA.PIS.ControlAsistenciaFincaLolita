@@ -23,3 +23,6 @@
     - Código de Android está en `src/ClienteMovil`
 - Visual Studio Code
     - Para otros archivos o documentación, generalmente, el resto de los módulos en `src`
+- MySQL Workbench
+    - Permite conectarse directamente a la base de datos para revisar o cambiar los datos.
+
