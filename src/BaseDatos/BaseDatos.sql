@@ -2,7 +2,7 @@
 use control_asistencia_finca_lolita;
 
 CREATE TABLE empleado (
-    id INT AUTO_INCREMENT,
+    id BIGINT AUTO_INCREMENT,
     nombre VARCHAR(50),
     token_celular BINARY(64),
     activo BOOLEAN,
@@ -17,7 +17,7 @@ CREATE TABLE codigo_qr (
 );
 CREATE TABLE asistencia (
     id INT AUTO_INCREMENT,
-    empleado_id INT,
+    empleado_id BIGINT,
     codigo_qr_id INT,
     fecha_hora DATETIME,
     observacion VARCHAR(100),
@@ -31,6 +31,8 @@ CREATE TABLE preferencia (
     valor VARCHAR(100),
     PRIMARY KEY (nombre)
 );
+
+-- TODO Crear vistas para los métodos GET
 
 INSERT INTO preferencia VALUES ("Min. Hora entrada", "06:00");
 INSERT INTO preferencia VALUES ("Hora entrada", "08:00");
