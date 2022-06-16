@@ -41,14 +41,15 @@ class Intro : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_intro)
 
-        findViewById<TextView>(R.id.bienvendioUsuario).text = resources.getString(R.string.bienvenidoUsuario, "Walter Celi")
+        findViewById<TextView>(R.id.bienvendioUsuario).text = resources.getString(R.string.bienvenidoUsuario,
+            "Walter Celi")
         IniciarEscaneoQr()
 
         findViewById<Button>(R.id.botonEscanierQr).setOnClickListener {
             IniciarEscaneoQr()
         }
 
-        estado = null;
+        estado = false;
     }
 
     private fun IniciarEscaneoQr() {
