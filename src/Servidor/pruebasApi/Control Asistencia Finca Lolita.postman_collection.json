@@ -1,0 +1,79 @@
+{
+	"info": {
+		"_postman_id": "3ce509c1-13a4-4529-a04e-1485c7a80a45",
+		"name": "Control Asistencia Finca Lolita",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "crearOEditerEmpleado",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"0706291218\",\r\n    \"nombre\": \"Walter Anthony Celi Vaca\",\r\n    \"token_celular\": \"aeiou51215\",\r\n    \"activo\": 0,\r\n    \"tipo\": \"j\"\r\n}"
+				},
+				"url": {
+					"raw": "http://10.255.255.241/api/empleado.php?crear_empleado",
+					"protocol": "http",
+					"host": [
+						"10",
+						"255",
+						"255",
+						"241"
+					],
+					"path": [
+						"api",
+						"empleado.php"
+					],
+					"query": [
+						{
+							"key": "crear_empleado",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "borrarEmpleado",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"5615551552\"\r\n}"
+				},
+				"url": {
+					"raw": "http://10.255.255.241/api/empleado.php",
+					"protocol": "http",
+					"host": [
+						"10",
+						"255",
+						"255",
+						"241"
+					],
+					"path": [
+						"api",
+						"empleado.php"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
