@@ -1,6 +1,10 @@
 
 use control_asistencia_finca_lolita;
 
+-- TODO Modificarlos para que usen clave primaria independiente a la cédula, siendo por esto la razón
+--  de qye deban eliminarse los registros en logar de solamente inhabilitarse.
+-- TODO Por lo anteriormente dicho, agregar un campo "activo"
+
 CREATE TABLE empleado (
     id BIGINT AUTO_INCREMENT,
     nombre VARCHAR(50),
@@ -9,12 +13,20 @@ CREATE TABLE empleado (
     tipo VARCHAR(1),
     PRIMARY KEY (id)
 );
+CREATE VIEW empleado_vista AS
+	SELECT id, nombre, tipo FROM empleado WHERE activo=1;
+
 CREATE TABLE codigo_qr (
     id INT AUTO_INCREMENT,
     token BINARY(64),
     fecha_hora DATETIME,
     PRIMARY KEY (id)
 );
+CREATE VIEW codigo_qr_vista AS
+	SELECT hex(token) token, fecha_hora FROM codigo_qr;
+CREATE VIEW codigo_qr_vista_ultimo AS
+	SELECT hex(token) token, fecha_hora FROM codigo_qr ORDER BY id DESC LIMIT 1;
+
 CREATE TABLE asistencia (
     id INT AUTO_INCREMENT,
     empleado_id BIGINT,

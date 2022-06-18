@@ -9,7 +9,6 @@ if ($_SERVER['QUERY_STRING'] == "crear_empleado") {
 # Datos y funciones específicas
 $tabla = "empleado";
 
-// TODO Necesario también en API Asistencia, pero con clave modificada
 // TODO Validar que el tipo de empleado sea solamente j (jornalero) o a (administrador)
 function procesarCedulaOResponderSiError($postBody) {
     if (!isset($postBody["id"]) || !verificarCedula($postBody["id"])) {

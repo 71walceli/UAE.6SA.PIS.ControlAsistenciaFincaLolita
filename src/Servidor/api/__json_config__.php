@@ -8,7 +8,7 @@ $postBody = json_decode($rawPostBody, true);
 $postBodyOriginal = json_decode($rawPostBody, true);    // Se usará para poder mutar el dato original
                                                         // sin perder información original.
 
-// TODO Siempre pedir usuario y contraseña
+// TODO Autenticas con usuarios y contraseñas
 $response = array();
 
 function verificarParametrosExistentes($array, $lista) {
