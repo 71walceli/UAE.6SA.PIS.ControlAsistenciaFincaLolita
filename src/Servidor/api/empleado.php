@@ -116,43 +116,12 @@ try {
         }
     } 
     else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        // TODO No implementado
-        // TODO Debería usar una vista en lugar de la tabla directa.
         // TODO Debería pedir credenciales antes de revelar los datos.
-        throw new Error("No implementado.");
+        $sql = "SELECT * FROM ${tabla}_vista";
+        $datos = $mysql->query($sql);
         $response['status'] = 'success';
-        $response['message'] = '';
-        http_response_code(200);
-    
-        $sql = "SELECT id_rol, nombre FROM rol";
-        $datos = $mysql->query($sql);
-        $response["data"]["roles"] = $datos->fetch_all(MYSQLI_ASSOC);
+        $response["data"]= $datos->fetch_all(MYSQLI_ASSOC);
         $datos->free_result();
-    
-        $usuario_activo_cedula = $_GET["usuario_activo"];
-        if (isset($usuario_activo_cedula)) {
-            $sql = "SELECT	e.cedula_empleado AS cedulaEmpleado, e.nombre, e.apellido, e.usuario, 
-                        e.rol_id AS rolId, r.nombre AS rolNombre
-                FROM empleado e 
-                JOIN rol r ON e.rol_id = r.id_rol 
-                WHERE cedula_empleado!=$usuario_activo_cedula";
-        } else {
-            $sql = "SELECT	e.cedula_empleado AS cedulaEmpleado, e.nombre, e.apellido, e.usuario, 
-                        e.rol_id AS rolId, r.nombre AS rolNombre
-                FROM empleado e
-                JOIN rol r ON e.rol_id = r.id_rol";
-        }
-    
-        $datos = $mysql->query($sql);
-        $response["data"]["empleados"] = $datos->fetch_all(MYSQLI_ASSOC);
-        $datos->free_result();
-        $i = 0;
-        foreach ($response["data"]["empleados"] as $empleado) {
-            $response["data"]["empleados"][$i]["cedulaEmpleado"] 
-                    = str_pad($empleado["cedulaEmpleado"], 10, "0", STR_PAD_LEFT);
-            $i = $i+1;
-        }
-    
         echo json_encode($response, JSON_PRETTY_PRINT);
     }
     else if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
