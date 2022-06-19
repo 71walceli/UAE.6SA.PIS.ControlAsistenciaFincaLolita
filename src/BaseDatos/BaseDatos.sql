@@ -23,9 +23,7 @@ CREATE TABLE codigo_qr (
     PRIMARY KEY (id)
 );
 CREATE VIEW codigo_qr_vista AS
-	SELECT hex(token) token, fecha_hora FROM codigo_qr;
-CREATE VIEW codigo_qr_vista_ultimo AS
-	SELECT hex(token) token, fecha_hora FROM codigo_qr ORDER BY id DESC LIMIT 1;
+	SELECT id, hex(token) token, fecha_hora FROM codigo_qr;
 
 CREATE TABLE asistencia (
     id INT AUTO_INCREMENT,
@@ -37,6 +35,17 @@ CREATE TABLE asistencia (
     FOREIGN KEY (empleado_id) REFERENCES empleado(id),
     FOREIGN KEY (codigo_qr_id) REFERENCES codigo_qr(id)
 );
+ALTER TABLE asistencia 
+	MODIFY empleado_id BIGINT NOT NULL,
+    MODIFY codigo_qr_id INT NOT NULL;
+CREATE VIEW asistencia_vista AS
+	SELECT 
+		asistencia.id, asistencia.fecha_hora asistencia_fecha_hora, observacion,
+		empleado_id, empleado.nombre, 
+		codigo_qr_id, codigo_qr.fecha_hora codigo_qr_fecha_hora
+		FROM asistencia 
+			JOIN empleado ON (empleado.id=empleado_id)
+			JOIN codigo_qr ON (codigo_qr.id=codigo_qr_id);
 
 CREATE TABLE preferencia (
     nombre VARCHAR(25),

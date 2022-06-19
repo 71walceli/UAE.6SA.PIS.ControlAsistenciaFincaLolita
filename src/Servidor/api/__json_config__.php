@@ -19,3 +19,5 @@ function verificarParametrosExistentes($array, $lista) {
     }
     return true;
 }
+
+// TODO Crear funciones encargadas de las respuestas y refactorizar todo en función de estas
