@@ -1,6 +1,7 @@
 <?php 
 require_once("__mysql__.php");
 require_once("__json_config__.php");
+require_once("../lib/phpqrcode/qrlib.php");
 
 if ($_SERVER['QUERY_STRING'] == "crear_empleado") {
     # code...
@@ -44,14 +45,20 @@ try {
     else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         if ($_SERVER['QUERY_STRING'] == "ultimo") {
             $sql = "SELECT * FROM ${tabla}_vista_ultimo";
-        } else {
+            $datos = $mysql->query($sql);
+            $response['status'] = 'success';
+            $response["data"]= $datos->fetch_all(MYSQLI_ASSOC);
+            $datos->free_result();
+            echo json_encode($response, JSON_PRETTY_PRINT);
+        } 
+        else {
             $sql = "SELECT * FROM ${tabla}_vista";
+            $datos = $mysql->query($sql);
+            $response['status'] = 'success';
+            $response["data"]= $datos->fetch_all(MYSQLI_ASSOC);
+            $datos->free_result();
+            echo json_encode($response, JSON_PRETTY_PRINT);
         }
-        $datos = $mysql->query($sql);
-        $response['status'] = 'success';
-        $response["data"]= $datos->fetch_all(MYSQLI_ASSOC);
-        $datos->free_result();
-        echo json_encode($response, JSON_PRETTY_PRINT);
     }
     else if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
         $response['status'] = 'success';

@@ -1,4 +1,3 @@
-
 <?php
 $mysql = new mysqli("10.255.255.241", "control_asistencia_finca_lolita", 
     "1234567890abcdef", "control_asistencia_finca_lolita");
