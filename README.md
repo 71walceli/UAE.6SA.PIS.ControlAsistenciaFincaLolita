@@ -31,12 +31,23 @@
 - [ ] API
 - [ ] Requerimientos
     - [ ] Requerimientos
-        - [ ] Como jornalero necesito registrar mi asistencia escaneando un código QR, con el fun de facilitar el proceso ad administrador.
-        - [ ] Como administrador, necesito obtener un reporte de asistencia general, con la finalidad de tener una vista general de las inasistencias y atrasos así como los valores a pagar y/o a ser descontados.
-        - [ ] Como administrador, necesito obtener reportes por cada uno de los jornaleros, con el fin de analizar la situación de los empleados.
-        - [ ] Como jornalero, necesito visualizar mi reporte de asistencia, con el fin de constarar mis asiatencias y faltas.
-        - [ ] Como administtrador, necesito gestionar los empleados, con el fin de modificar datos o borrar empleadis según sea necesario.
-        - [ ] Como administrador, necesito que los códigos QR se generen por cada momento de marcado, con el fin de mitigar la posibilidad de fraude.
-        - [ ] Como administrador, necesito poder justificar inasistencias, con el fin de tener en cuenta feriados o situaciones de fuerza mayor.
-        - [ ] Como administrador, necesito poder realizar la asistencia solo en la red inalámbrica de la finca, con el fin de que puedan registrar la asistencia solo los empleados que están.
+        - [ ] Req1. Como jornalero necesito registrar mi asistencia escaneando un código QR, con el fun de facilitar el proceso ad administrador.
+        - [ ] Req2. Como administrador, necesito obtener un reporte de asistencia general, con la finalidad de tener una vista general de las inasistencias y atrasos así como los valores a pagar y/o a ser descontados.
+        - [ ] Req3. Como administrador, necesito obtener reportes por cada uno de los jornaleros, con el fin de analizar la situación de los empleados.
+        - [ ] Req4. Como jornalero, necesito visualizar mi reporte de asistencia, con el fin de constarar mis asiatencias y faltas.
+        - [ ] Req5. Como administrador, necesito gestionar los empleados, con el fin de modificar datos o borrar empleadis según sea necesario.
+        - [ ] Req6. Como administrador, necesito que los códigos QR se generen por cada momento de marcado, con el fin de mitigar la posibilidad de fraude.
+        - [ ] Req7. Como administrador, necesito poder justificar inasistencias, con el fin de tener en cuenta feriados o situaciones de fuerza mayor.
+        - [ ] Req8. Como administrador, necesito poder realizar la asistencia solo en la red inalámbrica de la finca, con el fin de que puedan registrar la asistencia solo los empleados que están.
 
+# Casos de uso
+- [ ] Uso1: Registro de jornaleros
+    - Procedumiento
+        1. El administrador registra el empleado a través de la página Web.
+           - Datos del empleado
+               - CI
+               - Nombre y apellido
+               - Rol
+        2. El jornalero escanea el código QR con el celular, con lo cual queda registrado con su dispositiov.
+              1. El celular escanea el código QR
+              2. Este establece un token con el que iniciar sesión y registrar la asistencia.
