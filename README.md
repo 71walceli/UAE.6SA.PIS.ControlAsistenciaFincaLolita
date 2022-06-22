@@ -27,8 +27,8 @@
     - Permite conectarse directamente a la base de datos para revisar o cambiar los datos.
 
 # Tareas
-- [ ] Base de datos
-- [ ] API
+- [x] Base de datos
+- [x] API
 - [ ] Requerimientos
     - [ ] Requerimientos
         - [ ] Req1. Como jornalero necesito registrar mi asistencia escaneando un código QR, con el fun de facilitar el proceso ad administrador.
