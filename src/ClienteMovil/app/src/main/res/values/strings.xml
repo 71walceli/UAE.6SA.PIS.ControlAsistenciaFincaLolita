@@ -6,4 +6,5 @@
     <string name="ustedRegistroHora">Usted se registró hoy a las %1s.</string>
     <string name="LlegoTemprano">Ha llegado %1s minutos antes.</string>
     <string name="LlegoTarde">Ha llegado con %1s minutos de atraso.</string>
+    <string name="necesitaRegistrarse">Escanee el código QR proveído cuando fue registrado.</string>
 </resources>

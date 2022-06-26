@@ -46,19 +46,19 @@
         app:layout_constraintVertical_bias="0.246" />
 
     <TextView
-        android:id="@+id/eitquetaUstedLLego"
+        android:id="@+id/eitquetaPrimaria"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/ustedRegistroHora"
+        android:text="@string/necesitaRegistrarse"
         android:textAlignment="center"
         android:textSize="32dp"
         android:layout_margin="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/etiquetaGracias" />
+        app:layout_constraintBottom_toTopOf="@id/etiquetaSecundaria" />
 
     <TextView
-        android:id="@+id/etiquetaGracias"
+        android:id="@+id/etiquetaSecundaria"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/graciasPorRegistrarAsistencia"
@@ -72,7 +72,7 @@
 
     <Button
         android:id="@+id/botonEscanierQr"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="55dp"
         android:text="Escanear QR"

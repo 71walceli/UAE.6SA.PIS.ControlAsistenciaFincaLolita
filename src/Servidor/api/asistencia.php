@@ -24,6 +24,60 @@ function procesarCedulaOResponderSiError($postBody) {
 # API
 try {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if ($_SERVER["QUERY_STRING"] == "registrar") {
+            // TODO Crear una nueva asistencia desde el celular deba requerir la contraseña.
+            if (!verificarParametrosExistentes($postBody, array(
+                    'empleado_id', 
+                    "empleado_token_celular", 
+                    "codigo_qr_token",
+                ))
+            ) {
+                $response = array(
+                    "status" => "error",
+                    "message" => "Campos requeridos faltantes."
+                );
+                http_response_code(400);
+                echo json_encode($response);
+                exit();
+            }
+            procesarCedulaOResponderSiError($postBody);
+
+            // Si no existe, agregarlo
+            $sql = "INSERT INTO $tabla(
+                            empleado_id, 
+                            codigo_qr_id, 
+                            fecha_hora,
+                            observacion
+                        ) VALUES (
+                            '".mysqli_escape_string($mysql, $postBody["empleado_id"])."', 
+                            (SELECT id FROM codigo_qr WHERE token=unhex(
+                                '".mysqli_escape_string($mysql, $postBody["codigo_qr_token"])."'
+                            )), 
+                            now(), 
+                            '' 
+                        )";
+            
+            $result = $mysql->query($sql);
+
+            if ($result) {
+                $response = array(
+                    "status" => "success",
+                    "message" => "Registro de $tabla guardado correctamente"
+                );
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                $response = array(
+                    "status" => "error",
+                    "message" => "Error al guardar registro de $tabla",
+                    "mysql_error" => $mysql->error,
+                    "mysql_errno" => $mysql->errno,
+                );
+                http_response_code(400);
+                echo json_encode($response);
+            }
+            exit();
+        }
         // Buscar si existe
         $sql = "SELECT id 
             FROM $tabla
@@ -53,7 +107,9 @@ try {
                             fecha_hora='".mysqli_escape_string($mysql, $postBody["fecha_hora"])."',
                             observacion='".mysqli_escape_string($mysql, $postBody["observacion"])."'
                         WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
-        } else {
+        } 
+        else {
+            // TODO Crear una nueva asistencia desde el celular deba requerir la contraseña.
             if (!verificarParametrosExistentes($postBody, array(
                     'empleado_id', 
                     "codigo_qr_token", 

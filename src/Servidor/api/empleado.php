@@ -32,36 +32,64 @@ try {
         $result = $mysql->query($sql);
 
         if ($result && $result->num_rows > 0) {
-            # Validaciones
-            // TODO Codigo que usa verificarParametrosExistentes deben y que responda si inválido
-            //  debe ser refactorizado en una función.
-            if (!verificarParametrosExistentes($postBody, array(
-                    'id', 
-                    "nombre", 
-                    "token_celular", 
-                    "activo", 
-                    "tipo",
-                ))
-            ) {
-                $response = array(
-                    "status" => "error",
-                    "message" => "Campos requeridos faltantes."
-                );
-                http_response_code(400);
-                echo json_encode($response);
-                exit();
+            if ($_SERVER["QUERY_STRING"] == "registrar_celular") {
+                # Validaciones
+                // TODO Codigo que usa verificarParametrosExistentes deben y que responda si inválido
+                //  debe ser refactorizado en una función.
+                if (!verificarParametrosExistentes($postBody, array(
+                        'id', 
+                        "token_celular", 
+                    ))
+                ) {
+                    $response = array(
+                        "status" => "error",
+                        "message" => "Campos requeridos faltantes."
+                    );
+                    http_response_code(400);
+                    echo json_encode($response);
+                    exit();
+                }
+                procesarCedulaOResponderSiError($postBody);
+    
+                // Actualizar si el registro existe
+                $sql = "UPDATE $tabla 
+                            SET 
+                                token_celular=unhex(sha2('".generar_contrasenia(mysqli_escape_string($mysql, $postBody["token_celular"]))."', 512)) 
+                            WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
+            } 
+            else {
+                # Validaciones
+                // TODO Codigo que usa verificarParametrosExistentes deben y que responda si inválido
+                //  debe ser refactorizado en una función.
+                if (!verificarParametrosExistentes($postBody, array(
+                        'id', 
+                        "nombre", 
+                        "token_celular", 
+                        "activo", 
+                        "tipo",
+                    ))
+                ) {
+                    $response = array(
+                        "status" => "error",
+                        "message" => "Campos requeridos faltantes."
+                    );
+                    http_response_code(400);
+                    echo json_encode($response);
+                    exit();
+                }
+                procesarCedulaOResponderSiError($postBody);
+    
+                // Actualizar si el registro existe
+                $sql = "UPDATE $tabla 
+                            SET 
+                                nombre='".mysqli_escape_string($mysql, $postBody["nombre"])."', 
+                                token_celular=unhex(sha2('".generar_contrasenia(mysqli_escape_string($mysql, $postBody["token_celular"]))."', 512)), 
+                                tipo='".mysqli_escape_string($mysql, $postBody["tipo"])."',
+                                activo='".mysqli_escape_string($mysql, $postBody["activo"])."'
+                            WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
             }
-            procesarCedulaOResponderSiError($postBody);
-
-            // Actualizar si el registro existe
-            $sql = "UPDATE $tabla 
-                        SET 
-                            nombre='".mysqli_escape_string($mysql, $postBody["nombre"])."', 
-                            token_celular=unhex(sha2('".generar_contrasenia(mysqli_escape_string($mysql, $postBody["token_celular"]))."', 512)), 
-                            tipo='".mysqli_escape_string($mysql, $postBody["tipo"])."',
-                            activo='".mysqli_escape_string($mysql, $postBody["activo"])."'
-                        WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
-        } else {
+        } 
+        else {
             if (!verificarParametrosExistentes($postBody, array(
                     'id', 
                     "nombre", 
