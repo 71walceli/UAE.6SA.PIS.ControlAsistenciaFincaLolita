@@ -1,0 +1,488 @@
+{
+	"info": {
+		"_postman_id": "3ce509c1-13a4-4529-a04e-1485c7a80a45",
+		"name": "Control Asistencia Finca Lolita",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Empleado",
+			"item": [
+				{
+					"name": "crearOEditerEmpleado",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"0706291226\",\r\n    \"nombre\": \"Dalay\",\r\n    \"token_celular\": \"aeiou51215\",\r\n    \"activo\": 1,\r\n    \"tipo\": \"j\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/empleado.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"empleado.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "borrarEmpleado",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"5615551552\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/empleado.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"empleado.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "consultarEmpleados",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://10.255.255.241/api/empleado.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"empleado.php"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Asistencia",
+			"item": [
+				{
+					"name": "crearAsistencia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"empleado_id\": \"0706291218\",\r\n    \"codigo_qr_token\": \"DBF8B956CC22ED84239DA6586AFC8CA36018386430E0A2C6A321963E221E3707A87F0865A86BD64007341D27664DA886B1A3637BE6546C5AA7CA9A355627D7FF\",\r\n    \"fecha_hora\": \"2024-06-18 17:45:15\",\r\n    \"observacion\": \"Ya es tarde.\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/asistencia.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"asistencia.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crearAsistencia.SinFecha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"empleado_id\": \"0706291218\",\r\n    \"codigo_qr_token\": \"DBF8B956CC22ED84239DA6586AFC8CA36018386430E0A2C6A321963E221E3707A87F0865A86BD64007341D27664DA886B1A3637BE6546C5AA7CA9A355627D7FF\",\r\n    \"observacion\": \"a\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/asistencia.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"asistencia.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "registrar asistencia desde Cero",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"empleado_id\": \"0706291218\",\r\n    \"empleado_token_celular\": \"aeiou12345\",\r\n    \"codigo_qr_token\": \"DBF8B956CC22ED84239DA6586AFC8CA36018386430E0A2C6A321963E221E3707A87F0865A86BD64007341D27664DA886B1A3637BE6546C5AA7CA9A355627D7FF\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/asistencia.php?registrar",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"asistencia.php"
+							],
+							"query": [
+								{
+									"key": "registrar",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EditerAsistencia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"2\",\r\n    \"fecha_hora\": \"2025-06-18 17:45:15\",\r\n    \"observacion\": \"A tiempo con 1 minuto.\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/asistencia.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"asistencia.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "borrarEmpleado",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"5615551552\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/empleado.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"empleado.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "consultarAsistencias",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://10.255.255.241/api/asistencia.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"asistencia.php"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Códigos QR",
+			"item": [
+				{
+					"name": "crearCodigosQR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://10.255.255.241/api/codigo_qr.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"codigo_qr.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "borrarCodigoQr",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"3\"\r\n}"
+						},
+						"url": {
+							"raw": "http://10.255.255.241/api/codigo_qr.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"codigo_qr.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "consultarCodigoQr",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://10.255.255.241/api/codigo_qr.php",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"codigo_qr.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "consultarCodigoQrUltimo",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://10.255.255.241/api/codigo_qr.php?ultimo",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"codigo_qr.php"
+							],
+							"query": [
+								{
+									"key": "ultimo",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Visualizar QR para asistencia",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://10.255.255.241/api/codigo_qr_visual.php?render_ultimo_qr",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"codigo_qr_visual.php"
+							],
+							"query": [
+								{
+									"key": "render_ultimo_qr",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Visualizar QR para asistencia Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://10.255.255.241/api/codigo_qr_visual.php?render_empleado_id=0706291218",
+							"protocol": "http",
+							"host": [
+								"10",
+								"255",
+								"255",
+								"241"
+							],
+							"path": [
+								"api",
+								"codigo_qr_visual.php"
+							],
+							"query": [
+								{
+									"key": "render_empleado_id",
+									"value": "0706291218"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
