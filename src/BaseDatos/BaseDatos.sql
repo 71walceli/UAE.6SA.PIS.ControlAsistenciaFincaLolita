@@ -46,22 +46,38 @@ CREATE VIEW asistencia_vista AS
 		FROM asistencia 
 			JOIN empleado ON (empleado.id=empleado_id)
 			JOIN codigo_qr ON (codigo_qr.id=codigo_qr_id);
+DELIMITER \\
+CREATE PROCEDURE asistencia_vista_empleado_ultima (IN _emoleado_id BIGINT)
+BEGIN
+	SELECT 
+		asistencia.id, asistencia.fecha_hora asistencia_fecha_hora, observacion,
+		empleado_id, empleado.nombre, 
+		codigo_qr_id, codigo_qr.fecha_hora codigo_qr_fecha_hora
+		FROM asistencia 
+			JOIN empleado ON (empleado.id=empleado_id)
+			JOIN codigo_qr ON (codigo_qr.id=codigo_qr_id)
+		WHERE empleado_id=_emoleado_id
+        ORDER BY asistencia.fecha_hora DESC
+        LIMIT 1;
+END\\
+DELIMITER ;
+
 
 CREATE TABLE preferencia (
     nombre VARCHAR(25),
     valor VARCHAR(100),
     PRIMARY KEY (nombre)
 );
+CREATE VIEW preferencia_vista AS 
+	SELECT * FROM preferencia ORDER BY nombre;
 
--- TODO Crear vistas para los métodos GET
-
-INSERT INTO preferencia VALUES ("Min. Hora entrada", "06:00");
-INSERT INTO preferencia VALUES ("Hora entrada", "08:00");
-INSERT INTO preferencia VALUES ("Max. Hora entrada", "09:00");
-INSERT INTO preferencia VALUES ("Hora receso", "12:00");
-INSERT INTO preferencia VALUES ("Max. Hora receso", "12:30");
-INSERT INTO preferencia VALUES ("Min. Hora receso fin", "12:30");
-INSERT INTO preferencia VALUES ("Hora receso fin", "13:00");
-INSERT INTO preferencia VALUES ("Max. Hora receso fin", "13:10");
-INSERT INTO preferencia VALUES ("Hora salida", "17:00");
-INSERT INTO preferencia VALUES ("Max. Hora salida", "18:00");
+INSERT INTO preferencia VALUES ("horaEntrada", "08:00");
+INSERT INTO preferencia VALUES ("horaReceso", "12:00");
+INSERT INTO preferencia VALUES ("horaRecesoFin", "13:00");
+INSERT INTO preferencia VALUES ("horaSalida", "17:00");
+INSERT INTO preferencia VALUES ("minHoraEntrada", "06:00");
+INSERT INTO preferencia VALUES ("maxHoraEntrada", "09:00");
+INSERT INTO preferencia VALUES ("maxHoraReceso", "12:30");
+INSERT INTO preferencia VALUES ("minHoraRecesoFin", "12:30");
+INSERT INTO preferencia VALUES ("maxHoraRecesoFin", "13:10");
+INSERT INTO preferencia VALUES ("maxHoraSalida", "18:00");
