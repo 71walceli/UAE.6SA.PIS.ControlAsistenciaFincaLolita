@@ -72,7 +72,7 @@ public object ControladorAsistencia {
         val empleado = ControladorEmpleado.cargarLocalmente(context)
 
         val json = Gson().toJson(mapOf(
-            "empleado_id" to asistencia.empleado_id,
+            "empleado_id" to asistencia.empleado_id.toString().padStart(10, '0'),
             "empleado_token_celular" to empleado.token_celular,
             "codigo_qr_token" to asistencia.codigoQrToken,
         ).toMap())

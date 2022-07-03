@@ -1,8 +1,8 @@
 <?php
 // TODO Hacer uso para código futuro.
-function responder($statos_code, $repponseObject) {
-    http_response_code($statos_code);
-    echo json_encode($repponseObject);
+function responder($codigoHttp, $objetoRespuesta) {
+    http_response_code($codigoHttp);
+    echo json_encode($objetoRespuesta);
     exit();
 }
 

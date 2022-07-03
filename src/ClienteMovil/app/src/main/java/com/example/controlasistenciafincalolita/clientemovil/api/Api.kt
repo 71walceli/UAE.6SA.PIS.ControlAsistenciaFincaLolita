@@ -9,22 +9,26 @@ public object Api {
     val MEDIA_TYPE = "application/json";
     val API_PATH = "http://10.255.255.241/api/"
 
-    public fun hacerSolicitudApiServidor(query: String, method: String, json: String): Response {
+    public fun hacerSolicitudApiServidor(query: String, method: String, json: String = "")
+    : Response {
         /* Hacer solicitudes al API del servidor por derecto
         * */
         val client: OkHttpClient = OkHttpClient().newBuilder().build()
         val mediaType: MediaType = MEDIA_TYPE.toMediaTypeOrNull()!!
-        val body: RequestBody = json.toRequestBody(mediaType)
-        val request: Request = Request.Builder()
+        var request = Request.Builder()
             .url("${API_PATH}${query}")
-            .method(method, body)
             .addHeader("Content-Type", MEDIA_TYPE)
-            .build()
-        val response: Response = client.newCall(request).execute()
+        request = if (method in listOf("POST", "PUT", "DELETE")) {
+            request
+                .method(method, json.toRequestBody(mediaType))
+        } else {
+            request
+        }
+        val response: Response = client.newCall(request.build()).execute()
         Log.d("ApiMovil", "Solicitud: ${method} ${API_PATH}${query}")
         Log.d("ApiMovil", "\t${json}")
         Log.d("ApiMovil", "Respuesta: ")
-        Log.d("ApiMovil", "\t${response.body?.string()}")
+        Log.d("ApiMovil", "\t${response.peekBody(Long.MAX_VALUE).string()}")
         return response
     }
 }

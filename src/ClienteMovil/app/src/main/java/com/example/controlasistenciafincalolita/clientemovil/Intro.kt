@@ -4,24 +4,25 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Display
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.example.controlasistenciafincalolita.clientemovil.api.ControladorAsistencia
-import com.example.controlasistenciafincalolita.clientemovil.api.ControladorEmpleado
-import com.example.controlasistenciafincalolita.clientemovil.api.ModeloAsistencia
-import com.example.controlasistenciafincalolita.clientemovil.api.ModeloEmpleado
+import com.example.controlasistenciafincalolita.clientemovil.api.*
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.zxing.integration.android.IntentIntegrator
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.thread
 
 // TODO Ubicar todas las cadenas de texto visibles en strings.xml
 class Intro : AppCompatActivity() {
-    var estadoRegistroAsistencia: Boolean? = null
+    var estadoRegistroAsistencia: Boolean? = null // TODO Eliminar
     private var _empleado: ModeloEmpleado? = null
     var empleado: ModeloEmpleado
         get() = _empleado!!
@@ -41,7 +42,7 @@ class Intro : AppCompatActivity() {
     var ultimaAsistencia: ModeloAsistencia
         get() = _ultimaAsistencia!!
         set(value) {
-            // TODO REvisar...
+            // TODO Revisar...
             findViewById<TextView>(R.id.eitquetaPrimaria).text =
                 if (empleado.id != 0 .toLong()) getString(R.string.necesitaRegistrarse)
                 else (if (value.id != 0) "Gracias por registrar su asistencia."
@@ -112,21 +113,40 @@ class Intro : AppCompatActivity() {
             if (empleado.id != 0 .toLong()) {
                 thread {
                     val nuevaAsistencia = ModeloAsistencia(empleado.id, result.contents)
-                    val response =
+                    var response =
                         ControladorAsistencia.registrar(this, nuevaAsistencia)
+                    val mensaje =
+                        if (response.isSuccessful) "Se creó el registro de asistencia."
+                        else "Falló el registro de asistencia."
                     ContextCompat.getMainExecutor(this).execute {
-                        val mensaje =
-                            if (response.isSuccessful) "Se creó el registro de asistencia."
-                            else "Falló el registro de asistencia."
                         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-                        if (response.isSuccessful) {
-                            // TODO Inicializar según valores devueltos por API
-                            ultimaAsistencia = ModeloAsistencia(1, empleado.id, result.contents,
-                                Date(), "")
-                        } else {
+                        //estadoRegistroAsistencia = response.isSuccessful
+                    }
+                    if (response.isSuccessful) {
+                        response = Api.hacerSolicitudApiServidor(
+                            "asistencia.php?ver_asistencia_empleado_id=${
+                                empleado.id.toString().padStart(10, '0')}", "P")
+
+                        val dato = JSONObject(response.peekBody(Long.MAX_VALUE).string())
+
+                        ContextCompat.getMainExecutor(this).execute {
+                            ultimaAsistencia = ModeloAsistencia(
+                                dato.getJSONArray("data").getJSONObject(0).getInt("id"),
+                                empleado.id,
+                                result.contents,
+                                SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+                                    .parse(dato.getJSONArray("data").getJSONObject(0)
+                                        .getString("asistencia_fecha_hora")
+                                    )!!,
+                                dato.getJSONArray("data").getJSONObject(0)
+                                    .getString("observacion")
+                            )
+                        }
+                    }
+                    else {
+                        ContextCompat.getMainExecutor(this).execute {
                             ultimaAsistencia = nuevaAsistencia
                         }
-                        estadoRegistroAsistencia = response.isSuccessful
                     }
                 }
             } else {

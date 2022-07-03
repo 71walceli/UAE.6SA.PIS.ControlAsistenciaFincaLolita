@@ -8,7 +8,8 @@ require_once("__preferencias__.php");
 # Cargar configuraciones
 
 # Datos y funciones específicas
-$tabla = "asistencia";
+$tabla = "preferencia";
+
 
 function procesarCedulaOResponderSiError($postBody) {
     if (!isset($postBody["empleado_id"]) || !verificarCedula($postBody["empleado_id"])) {
@@ -22,9 +23,11 @@ function procesarCedulaOResponderSiError($postBody) {
     }
 }
 
+// TODO Pendiente de terminar POST y DELETE
 # API
 try {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        throw new Error("No implementado");
         if ($_SERVER["QUERY_STRING"] == "registrar") {
             // TODO Crear una nueva asistencia desde el celular deba requerir la contraseña.
             if (!verificarParametrosExistentes($postBody, array(
@@ -37,12 +40,11 @@ try {
                     "status" => "error",
                     "message" => "Campos requeridos faltantes."
                 );
-                responder(400, $response);
+                http_response_code(400);
+                echo json_encode($response);
+                exit();
             }
             procesarCedulaOResponderSiError($postBody);
-
-            // Comparar horas con los parámetros
-            $preferenciasHoras = cargarPreferenciasHoras($mysql);
 
             // Si no existe, agregarlo
             $sql = "INSERT INTO $tabla(
@@ -172,47 +174,15 @@ try {
         }
     } 
     else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        if (isset($queryParams["ver_asistencia_empleado_id"])) {
-            if (!verificarCedula($queryParams["ver_asistencia_empleado_id"])) {
-                responder(400, [
-                    "status" => "error",
-                    "message" => "Número de cédula no se pudo validar."
-                ]);
-                exit();
-            }
-
-            // Si no existe, agregarlo
-            $sql = "CALL asistencia_vista_empleado_ultima(".$queryParams["ver_asistencia_empleado_id"].")";
-            
-            $result = $mysql->query($sql);
-
-            if ($result) {
-                $response['status'] = 'success';
-                $response["data"] = $result->fetch_all(MYSQLI_ASSOC);
-                $result->free_result();
-                responder(200, $response);
-            } else {
-                $response = array(
-                    "status" => "error",
-                    "message" => "Error al guardar registro de $tabla",
-                    "mysql_error" => $mysql->error,
-                    "mysql_errno" => $mysql->errno,
-                );
-                http_response_code(400);
-                echo json_encode($response);
-            }
-            exit();
-        }
-
-        // TODO Debería pedir credenciales antes de revelar los datos.
         $sql = "SELECT * FROM ${tabla}_vista";
         $datos = $mysql->query($sql);
         $response['status'] = 'success';
         $response["data"]= $datos->fetch_all(MYSQLI_ASSOC);
         $datos->free_result();
-        echo json_encode($response, JSON_PRETTY_PRINT);
+        responder(200, $response);
     }
     else if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+        throw new Error("No implementado");
         if (!verificarParametrosExistentes($postBody, array(
                 'id', 
             ))
