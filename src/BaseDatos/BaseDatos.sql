@@ -45,7 +45,8 @@ CREATE VIEW asistencia_vista AS
 		codigo_qr_id, codigo_qr.fecha_hora codigo_qr_fecha_hora
 		FROM asistencia 
 			JOIN empleado ON (empleado.id=empleado_id)
-			JOIN codigo_qr ON (codigo_qr.id=codigo_qr_id);
+			JOIN codigo_qr ON (codigo_qr.id=codigo_qr_id)
+		ORDER BY asistencia.fecha_hora;
 DELIMITER \\
 CREATE PROCEDURE asistencia_vista_empleado_ultima (IN _emoleado_id BIGINT)
 BEGIN
@@ -81,3 +82,4 @@ INSERT INTO preferencia VALUES ("maxHoraReceso", "12:30");
 INSERT INTO preferencia VALUES ("minHoraRecesoFin", "12:30");
 INSERT INTO preferencia VALUES ("maxHoraRecesoFin", "13:10");
 INSERT INTO preferencia VALUES ("maxHoraSalida", "18:00");
+INSERT INTO preferencia VALUES ("horaRegistroAsistencia", ""); -- Valor para simular hora
