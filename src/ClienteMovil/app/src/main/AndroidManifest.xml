@@ -17,6 +17,7 @@
         android:theme="@style/Theme.ControlAsistenciaFincaLolita"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <!-- TODO Orientación vertical para toda la aplicación. -->
         <activity
             android:name=".EscaneoCodigoQr"
             android:screenOrientation="fullSensor"
