@@ -16,3 +16,5 @@ function responder($codigoHttp, $objetoRespuesta) {
 //      - Almacenamiento en BD
 //  - Respuesta
 
+date_default_timezone_set("America/Bogota");
+
