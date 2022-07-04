@@ -1,8 +1,12 @@
 <?php
+require_once("__utils__.php");
+
 /**
  * Solo para uso interno del aplicativo
  */
 function cargarPreferenciasHoras($mysql) {
+    // TODO Optimizar código, no es necesario enumerar todas has horas, pues solo los valores que 
+    //  correspondan deben obtenerse.
     $datos = array(
         "horaEntrada" 
             => $mysql->query("SELECT valor FROM preferencia WHERE nombre='horaEntrada'")
@@ -33,9 +37,22 @@ function cargarPreferenciasHoras($mysql) {
             ->fetch_all()[0][0],
         "maxHoraSalida" 
             => $mysql->query("SELECT valor FROM preferencia WHERE nombre='maxHoraSalida'")
+            ->fetch_all()[0][0],
+        "horaRegistroAsistencia" 
+            => $mysql->query("SELECT valor FROM preferencia WHERE nombre='horaRegistroAsistencia'")
             ->fetch_all()[0][0]
         );
-        
+    
+    $_datos = $datos;
+
+    foreach ($datos as $key => $value) {
+        if (isset($datos[$key])) {
+            $_datos[$key] = new Hora($value);
+        }
+    }
+
+    $datos = $_datos;
+
     return $datos;
 }
 
