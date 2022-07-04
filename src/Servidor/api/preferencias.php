@@ -27,151 +27,47 @@ function procesarCedulaOResponderSiError($postBody) {
 # API
 try {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        throw new Error("No implementado");
-        if ($_SERVER["QUERY_STRING"] == "registrar") {
-            // TODO Crear una nueva asistencia desde el celular deba requerir la contraseña.
-            if (!verificarParametrosExistentes($postBody, array(
-                    'empleado_id', 
-                    "empleado_token_celular", 
-                    "codigo_qr_token",
-                ))
-            ) {
-                $response = array(
-                    "status" => "error",
-                    "message" => "Campos requeridos faltantes."
-                );
-                http_response_code(400);
-                echo json_encode($response);
-                exit();
-            }
-            procesarCedulaOResponderSiError($postBody);
-
-            // Si no existe, agregarlo
-            $sql = "INSERT INTO $tabla(
-                            empleado_id, 
-                            codigo_qr_id, 
-                            fecha_hora,
-                            observacion
-                        ) VALUES (
-                            '".mysqli_escape_string($mysql, $postBody["empleado_id"])."', 
-                            (SELECT id FROM codigo_qr WHERE token=unhex(
-                                '".mysqli_escape_string($mysql, $postBody["codigo_qr_token"])."'
-                            )), 
-                            now(), 
-                            '' 
-                        )";
-            
-            $result = $mysql->query($sql);
-
-            if ($result) {
-                $response = array(
-                    "status" => "success",
-                    "message" => "Registro de $tabla guardado correctamente"
-                );
-                http_response_code(200);
-                echo json_encode($response);
-            } else {
-                $response = array(
-                    "status" => "error",
-                    "message" => "Error al guardar registro de $tabla",
-                    "mysql_error" => $mysql->error,
-                    "mysql_errno" => $mysql->errno,
-                );
-                http_response_code(400);
-                echo json_encode($response);
-            }
-            exit();
+        # Validaciones
+        if (!verificarParametrosExistentes($postBody, array(
+            'nombre', 
+            "valor",
+            ))
+        ) {
+            responder(400, array(
+                "status" => "error",
+                "message" => "Campos requeridos faltantes."
+            ));
         }
+        // TODO Validar tipos de datos de entrada permitidos
+
         // Buscar si existe
-        $sql = "SELECT id 
+        $sql = "SELECT nombre 
             FROM $tabla
-            WHERE id='".mysqli_escape_string($mysql, $postBody['id'])."'";
+            WHERE nombre='".mysqli_escape_string($mysql, $postBody['nombre'])."'";
         $result = $mysql->query($sql);
 
         if ($result && $result->num_rows > 0) {
-            # Validaciones
-            if (!verificarParametrosExistentes($postBody, array(
-                    'id', 
-                    "fecha_hora",
-                    "observacion",
-                ))
-            ) {
-                $response = array(
-                    "status" => "error",
-                    "message" => "Campos requeridos faltantes."
-                );
-                http_response_code(400);
-                echo json_encode($response);
-                exit();
-            }
-            
             // Actualizar si el registro existe
             $sql = "UPDATE $tabla 
                         SET 
-                            fecha_hora='".mysqli_escape_string($mysql, $postBody["fecha_hora"])."',
-                            observacion='".mysqli_escape_string($mysql, $postBody["observacion"])."'
-                        WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
-        } 
-        else {
-            // TODO Crear una nueva asistencia desde el celular deba requerir la contraseña.
-            if (!verificarParametrosExistentes($postBody, array(
-                    'empleado_id', 
-                    "codigo_qr_token", 
-                    "observacion",
-                ))
-            ) {
-                $response = array(
-                    "status" => "error",
-                    "message" => "Campos requeridos faltantes."
-                );
-                http_response_code(400);
-                echo json_encode($response);
-                exit();
+                            valor='".mysqli_escape_string($mysql, $postBody["valor"])."'
+                        WHERE nombre='".mysqli_escape_string($mysql, $postBody["nombre"])."'";
+            $result = $mysql->query($sql);
+    
+            if ($result) {
+                responder(200, array(
+                    "status" => "success",
+                    "message" => "Registro de $tabla guardado correctamente"
+                ));
             }
-            procesarCedulaOResponderSiError($postBody);
-
-            if (!isset($postBody["fecha_hora"])) {
-                $fecha_hora = "now()";
-            } else {
-                $fecha_hora = "'".
-                    mysqli_escape_string($mysql, $postBody["fecha_hora"])
-                ."'";
-            }
-
-            // Si no existe, agregarlo
-            $sql = "INSERT INTO $tabla(
-                            empleado_id, 
-                            codigo_qr_id, 
-                            fecha_hora,
-                            observacion
-                        ) VALUES (
-                            '".mysqli_escape_string($mysql, $postBody["empleado_id"])."', 
-                            (SELECT id FROM codigo_qr WHERE token=unhex(
-                                '".mysqli_escape_string($mysql, $postBody["codigo_qr_token"])."'
-                            )), 
-                            $fecha_hora, 
-                            '".mysqli_escape_string($mysql, $postBody["observacion"])."' 
-                        )";
         }
-        $result = $mysql->query($sql);
-
-        if ($result) {
-            $response = array(
-                "status" => "success",
-                "message" => "Registro de $tabla guardado correctamente"
-            );
-            http_response_code(200);
-            echo json_encode($response);
-        } else {
-            $response = array(
+        else {
+            responder(400, array(
                 "status" => "error",
                 "message" => "Error al guardar registro de $tabla",
-                "mysql_error" => $mysql->error,
-                "mysql_errno" => $mysql->errno,
-            );
-            http_response_code(400);
-            echo json_encode($response);
+            ));
         }
+        
     } 
     else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $sql = "SELECT * FROM ${tabla}_vista";
@@ -180,52 +76,6 @@ try {
         $response["data"]= $datos->fetch_all(MYSQLI_ASSOC);
         $datos->free_result();
         responder(200, $response);
-    }
-    else if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
-        throw new Error("No implementado");
-        if (!verificarParametrosExistentes($postBody, array(
-                'id', 
-            ))
-        ) {
-            $response = array(
-                "status" => "error",
-                "message" => "Campos requeridos faltantes."
-            );
-            http_response_code(400);
-            echo json_encode($response);
-            exit();
-        }
-        procesarCedulaOResponderSiError($postBody);
-
-        $response['status'] = 'success';
-        $response['message'] = '';
-        http_response_code(200);
-    
-        $sql = "DELETE FROM $tabla 
-                    WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
-        $result = $mysql->query($sql);
-
-        //$affected_rows = $result->affected_rows;
-        if ($result) {
-            $response = array(
-                "status" => "success",
-                "message" => "Registro de $tabla eliminado correctamente",
-                //"affected" => $affected_rows,
-            );
-            http_response_code(200);
-            echo json_encode($response);
-        } else {
-            $response = array(
-                "status" => "error",
-                "message" => "Error al eliminar registro de $tabla",
-                "mysql_error" => $mysql->error,
-                "mysql_errno" => $mysql->errno,
-                //"affected" => $affected_rows,
-            );
-
-            http_response_code(400);
-            echo json_encode($response);
-        }
     }
     else {
         $response = array();
