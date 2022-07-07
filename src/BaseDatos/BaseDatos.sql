@@ -72,14 +72,14 @@ CREATE TABLE preferencia (
 CREATE VIEW preferencia_vista AS 
 	SELECT * FROM preferencia ORDER BY nombre;
 
-INSERT INTO preferencia VALUES ("horaEntrada", "08:00");
-INSERT INTO preferencia VALUES ("horaReceso", "12:00");
-INSERT INTO preferencia VALUES ("horaRecesoFin", "13:00");
-INSERT INTO preferencia VALUES ("horaSalida", "17:00");
 INSERT INTO preferencia VALUES ("minHoraEntrada", "06:00");
-INSERT INTO preferencia VALUES ("maxHoraEntrada", "09:00");
-INSERT INTO preferencia VALUES ("maxHoraReceso", "12:30");
+INSERT INTO preferencia VALUES ("horaEntrada", "08:00");
+INSERT INTO preferencia VALUES ("maxHoraEntrada", "11:59");
+INSERT INTO preferencia VALUES ("horaReceso", "12:00");
+INSERT INTO preferencia VALUES ("maxHoraReceso", "12:29");
 INSERT INTO preferencia VALUES ("minHoraRecesoFin", "12:30");
-INSERT INTO preferencia VALUES ("maxHoraRecesoFin", "13:10");
+INSERT INTO preferencia VALUES ("horaRecesoFin", "13:00");
+INSERT INTO preferencia VALUES ("maxHoraRecesoFin", "16:59");
+INSERT INTO preferencia VALUES ("horaSalida", "17:00");
 INSERT INTO preferencia VALUES ("maxHoraSalida", "18:00");
 INSERT INTO preferencia VALUES ("horaRegistroAsistencia", ""); -- Valor para simular hora
