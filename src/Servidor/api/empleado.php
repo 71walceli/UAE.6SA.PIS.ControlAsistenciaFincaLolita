@@ -1,10 +1,7 @@
 <?php 
 require_once("__mysql__.php");
 require_once("__json_config__.php");
-
-if ($_SERVER['QUERY_STRING'] == "crear_empleado") {
-    # code...
-}
+require_once("__api_json__.php");
 
 # Datos y funciones específicas
 $tabla = "empleado";
@@ -25,6 +22,44 @@ function procesarCedulaOResponderSiError($postBody) {
 # API
 try {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if ($_SERVER['QUERY_STRING'] == "inicio_sesion") {
+            if (!verificarParametrosExistentes($postBody, array(
+                    'id', 
+                    "token_celular", 
+                ))
+            ) {
+                responder(400, array(
+                    "status" => "error",
+                    "message" => "Campos requeridos faltantes."
+                ));
+            }
+            procesarCedulaOResponderSiError($postBody);
+
+            $sql = "SELECT nombre FROM $tabla WHERE
+                        token_celular=unhex(sha2('"
+                            .generar_contrasenia(mysqli_escape_string($mysql, 
+                                $postBody["token_celular"])
+                            )."', 512)) 
+                        AND id='".mysqli_escape_string($mysql, $postBody["id"])."'
+                        AND tipo='a'";
+            
+            $result = $mysql->query($sql);
+
+            if ($result && $result->num_rows > 0) {
+                $response['status'] = 'success';
+                $response['mensaje'] = 'Inicio de sesión correcto';
+                $response["data"]= $result->fetch_all(MYSQLI_ASSOC)[0];
+                $result->free_result();
+                responder(200, $response);
+            }
+            else {
+                responder(400, array(
+                    "status" => "Error",
+                    "mensaje" => "Credenciales incorrectas",
+                ));
+            }
+        }
+
         // Buscar si existe
         $sql = "SELECT id 
             FROM $tabla
