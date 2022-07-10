@@ -1,7 +1,15 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+// Configuración inicial de respuesta HTTP
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers:  Content-Type, X-Auth-Token, Authorization, Origin, Referres, User-Agent');
+header('Access-Control-Allow-Methods:  POST, GET, DELETE');
 header('Content-Type: application/json');
 http_response_code(200);
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    // Consulta de políticas CORS por parte de los navegadores. Solo se requiere responder con los 
+    //  encabezados.
+    exit();
+}
 
 $rawPostBody = file_get_contents('php://input');
 $postBody = json_decode($rawPostBody, true);
