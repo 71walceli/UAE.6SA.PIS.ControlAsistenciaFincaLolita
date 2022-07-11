@@ -1,5 +1,6 @@
 import React from "react"
 import { Form, Button, ButtonToolbar, Toggle, Schema } from "rsuite"
+import { notificar } from "../componentes/Notificaciones"
 import { hacerLlamadaApiInterna } from "../ultil"
 
 
@@ -32,8 +33,7 @@ export const Login = (props) => {
                 nombre: resultado.data.nombre,
                 expiracion: credenciales.recordarContrasenia
                     ? new Date("9999-12-31T23:59:59.999")
-                    //: new Date(new Date().setMinutes(new Date().getMinutes() + 60)),
-                    : new Date(new Date().setMinutes(new Date().getMinutes() + 1)),
+                    : new Date(new Date().setMinutes(new Date().getMinutes() + 60)),
             }
             props.setCredenciales(_credenciales)
         } else {
@@ -46,7 +46,7 @@ export const Login = (props) => {
     }, [])
 
     return (
-        <Form 
+        <Form style={props.style}
             formValue={credenciales} 
             onChange={setCredenciales} 
             model={_validadador} 
@@ -66,6 +66,12 @@ export const Login = (props) => {
                 <Form.Control name="recordarContrasenia" accepter={Toggle} 
                     checked={credenciales.recordarContrasenia}
                 />
+                <Form.HelpText>
+                    {credenciales.recordarContrasenia 
+                        ? "Su sesión no se cerrará hasta que usted la cierre manualmente."
+                        : "La sesión quedará disponible por máximo una hora una vez iniciada."
+                    }
+                </Form.HelpText>
             </Form.Group>
             <Form.Group>
                 <ButtonToolbar>
