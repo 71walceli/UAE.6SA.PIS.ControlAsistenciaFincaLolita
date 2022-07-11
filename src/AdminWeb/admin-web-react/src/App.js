@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Message, Nav, Navbar, toaster, useToaster } from "rsuite";
+import { Nav, Navbar, toaster } from "rsuite";
 import { notificar } from "./componentes/Notificaciones";
+import { LandingPage } from "./pantallas/LandingPage";
 import { Login } from "./pantallas/Login";
-import { esperar } from "./ultil";
 
 
 function App() {
-  const [ loaded, setLoaded ] = React.useState(true)
   const [ credenciales, _setCredenciales ] = React.useState()
   const setCredenciales = _credenciales => {
     if (_credenciales) {
@@ -37,8 +36,8 @@ function App() {
   return (
     <div className="App" 
       style={{
-        width: "96vw",
-        height: "100vh",
+        width: "96%",
+        height: "100%",
         marginLeft: "2vw",
         marginRight: "2vw",
       }}
@@ -58,8 +57,8 @@ function App() {
           <Nav.Item>Configuración</Nav.Item>
           {credenciales 
             ? [
-                <Nav.Item key="0">{ credenciales.nombre }</Nav.Item>,
-                <Nav.Item key="1">Cerrar Sesión</Nav.Item>,
+                <Nav.Item key="1">{ credenciales.nombre }</Nav.Item>,
+                <Nav.Item key="2">Cerrar Sesión</Nav.Item>,
               ]
             : <Nav.Item>Iniciar Sesión</Nav.Item>
           }
@@ -68,12 +67,14 @@ function App() {
       <React.StrictMode>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={
-              <Login credenciales={credenciales} setCredenciales={setCredenciales} 
-                style={{}}
-              />
-            }>
-            </Route>
+            <Route path="/" 
+              element={<LandingPage />} 
+            />
+            <Route path="/login" 
+              element={<Login 
+                credenciales={credenciales} setCredenciales={setCredenciales} 
+              />} 
+            />
             {/*
             // TODO
             <Route index element={<Home />} />
