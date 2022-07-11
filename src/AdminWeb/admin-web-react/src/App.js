@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { Nav, Navbar, toaster } from "rsuite";
 import { notificar } from "./componentes/Notificaciones";
 import { LandingPage } from "./pantallas/LandingPage";
-import { Login } from "./pantallas/Login";
+import { InicioSesión } from "./pantallas/Login";
 
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
     else {
       localStorage.removeItem("credenciales")
       _setCredenciales(null)
-      notificar(`Error de inicio de sesión`, { type: "error" })
+      window.location.href = "/"
     }
   }
 
@@ -44,7 +44,7 @@ function App() {
     >
       <Navbar>
         <Nav>
-          <Nav.Item>Inicio</Nav.Item>
+          <Nav.Item href="/">Inicio</Nav.Item>
           {credenciales 
             ? [
                 <Nav.Item key="1">Jornaleros</Nav.Item>,
@@ -54,13 +54,19 @@ function App() {
             }
         </Nav>
         <Nav pullRight>
-          <Nav.Item>Configuración</Nav.Item>
           {credenciales 
             ? [
+                <Nav.Item key="0">Configuración</Nav.Item>,
                 <Nav.Item key="1">{ credenciales.nombre }</Nav.Item>,
-                <Nav.Item key="2">Cerrar Sesión</Nav.Item>,
+                <Nav.Item key="2" 
+                  onClick={() => {
+                    setCredenciales(null)}
+                  }
+                >
+                  Cerrar Sesión
+                </Nav.Item>,
               ]
-            : <Nav.Item>Iniciar Sesión</Nav.Item>
+            : <Nav.Item href="/inicio_sesion">Iniciar Sesión</Nav.Item>
           }
         </Nav>
       </Navbar>
@@ -70,8 +76,8 @@ function App() {
             <Route path="/" 
               element={<LandingPage />} 
             />
-            <Route path="/login" 
-              element={<Login 
+            <Route path="/inicio_sesion" 
+              element={<InicioSesión 
                 credenciales={credenciales} setCredenciales={setCredenciales} 
               />} 
             />
