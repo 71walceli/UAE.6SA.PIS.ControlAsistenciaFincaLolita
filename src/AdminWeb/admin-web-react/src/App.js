@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { Nav, Navbar, toaster } from "rsuite";
 import { notificar } from "./componentes/Notificaciones";
+import { Empleados } from "./pantallas/Empleados";
 import { LandingPage } from "./pantallas/LandingPage";
 import { InicioSesión } from "./pantallas/Login";
 
@@ -47,8 +48,9 @@ function App() {
           <Nav.Item href="/">Inicio</Nav.Item>
           {credenciales 
             ? [
-                <Nav.Item key="1">Jornaleros</Nav.Item>,
+                <Nav.Item key="1" href="/empleados">Empleados</Nav.Item>,
                 <Nav.Item key="2">Reportes</Nav.Item>,
+                <Nav.Item key="3">Configuración</Nav.Item>,
               ]
             : null
             }
@@ -56,8 +58,7 @@ function App() {
         <Nav pullRight>
           {credenciales 
             ? [
-                <Nav.Item key="0">Configuración</Nav.Item>,
-                <Nav.Item key="1">{ credenciales.nombre }</Nav.Item>,
+                <Nav.Item key="1" disabled>{ credenciales.nombre }</Nav.Item>,
                 <Nav.Item key="2" 
                   onClick={() => {
                     setCredenciales(null)}
@@ -78,6 +79,11 @@ function App() {
             />
             <Route path="/inicio_sesion" 
               element={<InicioSesión 
+                credenciales={credenciales} setCredenciales={setCredenciales} 
+              />} 
+            />
+            <Route path="/empleados" 
+              element={<Empleados 
                 credenciales={credenciales} setCredenciales={setCredenciales} 
               />} 
             />
