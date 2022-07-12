@@ -1,5 +1,6 @@
 import React, { useRef } from "react"
 import { Button, ButtonGroup, ButtonToolbar, Panel, Row, Col, Table, Grid, Modal, Form, Schema, MaskedInput, SelectPicker } from "rsuite"
+import { notificar } from "../componentes/Notificaciones"
 import { hacerLlamadaApiInterna } from "../ultil"
 
 export const Empleados = () => {
@@ -7,15 +8,18 @@ export const Empleados = () => {
     a: "Administrador",
     j: "Jornalero",
   }
+
   
   const [ empleados, setEmpleados ] = React.useState([])
+  const cargarEmpleados = () => hacerLlamadaApiInterna("GET", "empleado.php")  
+    .then(respuesta => {
+      if (respuesta.status === "success") {
+        setEmpleados(respuesta.data)
+      }
+    })
+  
   React.useEffect(() => {
-    hacerLlamadaApiInterna("GET", "empleado.php")  
-      .then(respuesta => {
-        if (respuesta.status === "success") {
-          setEmpleados(respuesta.data)
-        }
-      })
+    cargarEmpleados()
   }, [])
 
   const [ modoDialogo, setModoDialogo ] = React.useState("editar")
@@ -53,7 +57,9 @@ export const Empleados = () => {
           </Panel>
         )
       })}
-      {<Dialogo modoDialogo={modoDialogo} setModoDialogo={setModoDialogo} />}
+      {<Dialogo modoDialogo={modoDialogo} setModoDialogo={setModoDialogo} 
+        cargarEmpleados={cargarEmpleados} empleados={empleados}
+      />}
     </div>
   )
 }
@@ -62,7 +68,12 @@ const Dialogo = props => {
   const _validadador = Schema.Model({
     id: Schema.Types.StringType("Debe ser de 10 dígitos.")
       .isRequired("Requerido")
-      .pattern(/\d{10}/, "Debe ser de 10 dígitos."),
+      .pattern(/\d{10}/, "Debe ser de 10 dígitos.")
+      .addRule(value => props.empleados.filter(e => {
+            return e.id.toString().padStart(10, "0") === value.toString()
+          }).length === 0
+        , "Cédula existente")
+      ,
     nombre: Schema.Types.StringType("Procure una contraseña segura")
       .isRequired("Requerido")
       .addRule((value, data) => (/([A-Z][a-z]+)+/.test(value))
@@ -70,7 +81,8 @@ const Dialogo = props => {
       ,
     token_celular: Schema.Types.StringType("Procure una contraseña segura")
       .isRequired("Requerido")
-      .minLength(6, "Al menos 6 caracteres."),
+      .minLength(6, "Al menos 6 caracteres.")
+      ,
     tipo: Schema.Types.StringType("Requerido").isRequired("Requerido")
   })
 
@@ -85,15 +97,25 @@ const Dialogo = props => {
       "tipo": "",
     })
   const [ validado, setValidado ] = React.useState(false)
+  const [ visible, setVisible ] = React.useState(true)
 
   const guardar = empleado => {
+    hacerLlamadaApiInterna("POST", "empleado.php", empleado)
+      .then(_respuesta => {
+        notificar(_respuesta.message, { type: _respuesta.status })
+        if (_respuesta.status === "success") {
+          setVisible(false)
+          props.cargarEmpleados()
+        }
+      })
   }
 
   React.useEffect(() => {
     formulario.current.checkAsync(empleado)
   }, [])
 
-  return <Modal open={props.modoDialogo === "editar"}>
+  return <Modal open={visible} onExited={() => props.setModoDialogo("")}
+  >
     {(() => {
       if (props.modoDialogo === "editar") {
         return (
@@ -132,8 +154,8 @@ const Dialogo = props => {
                 </Form.Group>
                 <Form.Group controlId="tipo">
                   <Form.ControlLabel>Tipo</Form.ControlLabel>
-                  <Form.Control name="tipo" type="select" checkAsync autoComplete="off" 
-                    accepter={SelectPicker} errorPlacement="rightEnd"
+                  <Form.Control name="tipo" checkAsync autoComplete="off" accepter={SelectPicker} 
+                    errorPlacement="rightEnd"
                     data={[
                       {
                         label: "Administrador",
@@ -151,7 +173,7 @@ const Dialogo = props => {
                     <Button type="submit" appearance="primary" disabled={!validado}>
                       Guardar
                     </Button>
-                    <Button appearance="default" onClick={() => props.setModoDialogo("")}>
+                    <Button appearance="default" onClick={() => setVisible(false)}>
                       Cancelar
                     </Button>
                   </ButtonToolbar>
