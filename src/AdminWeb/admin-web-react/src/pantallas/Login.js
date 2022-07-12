@@ -1,6 +1,6 @@
 import React from "react"
 import { useNavigate } from "react-router-dom"
-import { Form, Button, ButtonToolbar, Toggle, Schema } from "rsuite"
+import { Form, Button, ButtonToolbar, Toggle, Schema, MaskedInput } from "rsuite"
 import { notificar } from "../componentes/Notificaciones"
 import { hacerLlamadaApiInterna } from "../ultil"
 
@@ -17,12 +17,15 @@ export const InicioSesión = (props) => {
       .addRule(value => value.length >= 6, "Al menos 6 caracteres.")
   })
 
+  const formulario = React.useRef(null)
   const [credenciales, setCredenciales] = React.useState({
     "id": "",
     "token_celular": "",
     "recordarContrasenia": true,
   })
+
   const [validado, setValidado] = React.useState(false)
+
 
   const iniciarSesion = async (credenciales) => {
     const resultado = await hacerLlamadaApiInterna("POST", "empleado.php?inicio_sesion",
@@ -47,10 +50,16 @@ export const InicioSesión = (props) => {
 
   React.useState(() => {
     document.title = "Iniciar sesión"
+    setTimeout(() => {
+      if (!!formulario.current) {
+        formulario.current.check(credenciales)
+      }
+    }, 250);
   }, [])
 
   return (
-    <Form style={props.style}
+    <Form style={props.style} 
+      ref={formulario}
       formValue={credenciales}
       onChange={setCredenciales}
       model={_validadador}
@@ -58,17 +67,23 @@ export const InicioSesión = (props) => {
       onSubmit={() => iniciarSesion(credenciales)}
     >
       <Form.Group controlId="id">
-        <Form.ControlLabel>Número cédula</Form.ControlLabel>
-        <Form.Control name="id" type="text" checkAsync autoComplete="user" />
+        <Form.ControlLabel>Usuario</Form.ControlLabel>
+        <Form.Control name="id" type="text" checkAsync autoComplete="off" 
+          accepter={MaskedInput} guide="0123456789"
+          placeholderChar="#"
+          mask={[/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,]} errorPlacement="topEnd"
+        />
       </Form.Group>
       <Form.Group controlId="token_celular">
         <Form.ControlLabel>Contraseña</Form.ControlLabel>
-        <Form.Control name="token_celular" type="password" checkAsync autoComplete="password" />
+        <Form.Control name="token_celular" type="password" checkAsync autoComplete="off" 
+          errorPlacement="topEnd"
+        />
       </Form.Group>
       <Form.Group controlId="recordarContrasenia">
         <Form.ControlLabel>Recordar Contraseña</Form.ControlLabel>
         <Form.Control name="recordarContrasenia" accepter={Toggle}
-          checked={credenciales.recordarContrasenia}
+          checked={credenciales.recordarContrasenia} errorPlacement="topEnd"
         />
         <Form.HelpText>
           {credenciales.recordarContrasenia
