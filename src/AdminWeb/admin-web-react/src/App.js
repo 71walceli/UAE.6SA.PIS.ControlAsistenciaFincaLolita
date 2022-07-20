@@ -31,6 +31,7 @@ function App() {
   }
 
   useEffect(() => {
+    document.title = "Finca Lolita"
     iniciarSesión()
   }, [])
 

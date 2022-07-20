@@ -29,3 +29,13 @@ const recuperarCredenciales = () => {
     } 
     return _credenciales
 }
+
+// Obtenidio de https://stackoverflow.com/a/48125735/7107690
+export function esperar(time) {
+  return new Promise(resolve => {
+      setTimeout(() => {
+          resolve();
+      }, time);
+  });
+}
+

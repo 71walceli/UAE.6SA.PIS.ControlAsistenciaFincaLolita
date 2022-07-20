@@ -18,18 +18,35 @@ export const Empleados = () => {
       }
     })
   
+  const [ modoDialogo, setModoDialogo ] = React.useState("editar")
+  const [ indiceEmpleadoActual, setIndiceEmpleadoActual ] = React.useState(-1)
+  const [ dialogoVisible, setDialogoVisible ] = React.useState(false)
+  
   React.useEffect(() => {
     cargarEmpleados()
   }, [])
 
-  const [ modoDialogo, setModoDialogo ] = React.useState("editar")
+  const mostrarDialogo = (_modoDialogo = "editar", _indiceEmpleadoActual = -1) => {
+    setDialogoVisible(true)
+    setModoDialogo(_modoDialogo)
+    setIndiceEmpleadoActual(_indiceEmpleadoActual)
+  }
+
 
   return (
     <div style={{
       width: "60%",
       minWidth: 320,
     }}>
-      {empleados.map(empleado => {
+      <ButtonToolbar>
+        <Button 
+          appearance="primary"
+          onClick={() => mostrarDialogo()}
+        >
+          Agregar empleado
+        </Button>
+      </ButtonToolbar>
+      {empleados.map((empleado, i) => {
         return (
           <Panel bordered header={empleado.nombre} style={{
           }}>
@@ -58,7 +75,10 @@ export const Empleados = () => {
         )
       })}
       {<Dialogo modoDialogo={modoDialogo} setModoDialogo={setModoDialogo} 
-        cargarEmpleados={cargarEmpleados} empleados={empleados}
+        cargarEmpleados={cargarEmpleados} empleados={empleados} 
+        indiceEmpleadoActual={indiceEmpleadoActual} 
+        setIndiceEmpleadoActual={setIndiceEmpleadoActual}
+        dialogoVisible={dialogoVisible} setDialogoVisible={setDialogoVisible}
       />}
     </div>
   )
@@ -87,7 +107,7 @@ const Dialogo = props => {
   })
 
   const formulario = useRef()
-  const [ empleado, setEmpleados ] = React.useState(props.empleado 
+  const [ empleado, setEmpleados ] = React.useState(props.indiceEmpleadoActual !== -1 
     ? {...props.empleado} 
     : {
       "id": "",
@@ -96,25 +116,40 @@ const Dialogo = props => {
       "activo": 1,
       "tipo": "",
     })
-  const [ validado, setValidado ] = React.useState(false)
-  const [ visible, setVisible ] = React.useState(true)
+  // TODO Aplicarlo en Login y resto de formularios
+  const [ erroresValidacion, setErroresValidacion ] = React.useState({
+    "id": "Requerido",
+    "nombre": "Requerido",
+    "token_celular": "Requerido",
+    "tipo": "Requerido",
+  })
 
   const guardar = empleado => {
     hacerLlamadaApiInterna("POST", "empleado.php", empleado)
       .then(_respuesta => {
         notificar(_respuesta.message, { type: _respuesta.status })
         if (_respuesta.status === "success") {
-          setVisible(false)
+          props.setDialogoVisible(false)
           props.cargarEmpleados()
         }
       })
   }
 
   React.useEffect(() => {
-    formulario.current.checkAsync(empleado)
+    props.setIndiceEmpleadoActual(-1)
   }, [])
 
-  return <Modal open={visible} onExited={() => props.setModoDialogo("")}
+  const alCerrarse = () => {
+    props.setModoDialogo("")
+    setEmpleados({
+      "id": "",
+      "nombre": "",
+      "token_celular": "",
+      "activo": 1,
+      "tipo": "",
+    })
+  }
+  return <Modal open={props.dialogoVisible} onExited={alCerrarse}
   >
     {(() => {
       if (props.modoDialogo === "editar") {
@@ -124,10 +159,11 @@ const Dialogo = props => {
             <Modal.Body>
               <Form style={props.style} ref={formulario}
                 formValue={empleado}
+                formError={erroresValidacion}
                 onChange={setEmpleados}
                 model={_validadador}
-                onCheck={(validaciones) => { 
-                    setValidado(Object.entries(validaciones).length === 0) 
+                onCheck={(_erroresValidacion) => { 
+                    setErroresValidacion(_erroresValidacion)
                   } 
                 }
                 onSubmit={() => guardar(empleado)}
@@ -170,10 +206,12 @@ const Dialogo = props => {
                 </Form.Group>
                 <Form.Group>
                   <ButtonToolbar>
-                    <Button type="submit" appearance="primary" disabled={!validado}>
+                    <Button type="submit" appearance="primary" disabled={
+                      Object.entries(erroresValidacion).length !== 0
+                    }>
                       Guardar
                     </Button>
-                    <Button appearance="default" onClick={() => setVisible(false)}>
+                    <Button appearance="default" onClick={() => props.setDialogoVisible(false)}>
                       Cancelar
                     </Button>
                   </ButtonToolbar>
