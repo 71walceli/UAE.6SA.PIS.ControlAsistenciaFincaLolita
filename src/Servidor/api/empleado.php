@@ -89,7 +89,10 @@ try {
                 // Actualizar si el registro existe
                 $sql = "UPDATE $tabla 
                             SET 
-                                token_celular=unhex(sha2('".generar_contrasenia(mysqli_escape_string($mysql, $postBody["token_celular"]))."', 512)) 
+                                token_celular=unhex(sha2('"
+                                    .generar_contrasenia(mysqli_escape_string($mysql, 
+                                        $postBody["token_celular"])
+                                    )."', 512))
                             WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
             } 
             else {
@@ -99,14 +102,12 @@ try {
                 if (!verificarParametrosExistentes($postBody, array(
                         'id', 
                         "nombre", 
-                        "token_celular", 
-                        "activo", 
                         "tipo",
                     ))
                 ) {
                     $response = array(
                         "status" => "error",
-                        "message" => "Campos requeridos faltantes."
+                        "message" => "Campos requeridos faltantes.1"
                     );
                     http_response_code(400);
                     echo json_encode($response);
@@ -118,13 +119,13 @@ try {
                 $sql = "UPDATE $tabla 
                             SET 
                                 nombre='".mysqli_escape_string($mysql, $postBody["nombre"])."', 
-                                token_celular=unhex(sha2('".generar_contrasenia(mysqli_escape_string($mysql, $postBody["token_celular"]))."', 512)), 
                                 tipo='".mysqli_escape_string($mysql, $postBody["tipo"])."',
-                                activo='".mysqli_escape_string($mysql, $postBody["activo"])."'
+                                activo='1'
                             WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
             }
         } 
         else {
+            // Crear un registro nuevo
             if (!verificarParametrosExistentes($postBody, array(
                     'id', 
                     "nombre", 
@@ -152,7 +153,10 @@ try {
                         ) VALUES (
                             '".mysqli_escape_string($mysql, $postBody["id"])."', 
                             '".mysqli_escape_string($mysql, $postBody["nombre"])."', 
-                            unhex(sha2('".generar_contrasenia(mysqli_escape_string($mysql, $postBody["token_celular"]))."', 512)), 
+                            unhex(sha2('"
+                                .generar_contrasenia(mysqli_escape_string($mysql, 
+                                    $postBody["token_celular"])
+                                )."', 512)), 
                             '1', 
                             '".mysqli_escape_string($mysql, $postBody["tipo"])."' 
                         )";
