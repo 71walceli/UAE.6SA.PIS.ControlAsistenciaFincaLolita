@@ -1,5 +1,5 @@
 import React, { useRef } from "react"
-import { Button, ButtonGroup, ButtonToolbar, Panel, Row, Col, Table, Grid, Modal, Form, Schema, MaskedInput, SelectPicker } from "rsuite"
+import { Button, ButtonGroup, ButtonToolbar, Panel, Row, Col, Table, Grid, Modal, Form, Schema, MaskedInput, SelectPicker, Message } from "rsuite"
 import { notificar } from "../componentes/Notificaciones"
 import { hacerLlamadaApiInterna } from "../ultil"
 
@@ -49,7 +49,7 @@ export const Empleados = () => {
           Agregar empleado
         </Button>
       </ButtonToolbar>
-      {empleados.map((empleado, i) => {
+      {empleados.map((empleado, indiceEmpleado) => {
         const estilosBotones = {
           flexGrow: 1
         }
@@ -74,28 +74,32 @@ export const Empleados = () => {
               flexWrap: "wrap",
               justifyItems: "stretch",
             }}>
-              <Button type="submit" appearance="primary" style={estilosBotones}
+              <Button appearance="primary" style={estilosBotones}
                 onClick={
-                  () => mostrarDialogo("editar", i)
+                  () => mostrarDialogo("editar", indiceEmpleado)
                 }
               >
                 Editar
               </Button>
               {/*TODO Pendiente de implementar eventos de click*/}
-              <Button  type="submit" appearance="ghost" style={estilosBotones} onClick={ 
-                () => mostrarDialogo("cambiarContraseña", i)
+              <Button appearance="ghost" style={estilosBotones} onClick={ 
+                () => mostrarDialogo("cambiarContraseña", indiceEmpleado)
               }>
                 Cambiar contraseña
               </Button>
               {empleado.tipo === "j" 
-                ?<Button type="submit" appearance="ghost" style={estilosBotones} onClick={
-                  () => {}
+                ?<Button appearance="ghost" style={estilosBotones} onClick={
+                  () => mostrarDialogo("registrarCelular", indiceEmpleado)
                 }>
                   Registrar celular
                 </Button>
                 : null
               }
-              <Button appearance="ghost" style={estilosBotones} color="red" href="/">Eliminar</Button>
+              <Button appearance="ghost" color="red" onClick={
+                () => mostrarDialogo("eliminar", indiceEmpleado)
+              }>
+                Eliminar
+              </Button>
             </ButtonGroup>
           </Panel>
         )
@@ -151,6 +155,16 @@ const Dialogo = props => {
           }
         })
     }
+    if (props.modoDialogo === "eliminar") {
+      hacerLlamadaApiInterna("DELETE", "empleado.php", empleado)
+        .then(_respuesta => {
+          notificar(_respuesta.message, { type: _respuesta.status })
+          if (_respuesta.status === "success") {
+            props.setDialogoVisible(false)
+            props.cargarEmpleados()
+          }
+        })
+    }
   }
 
   const alCerrarse = () => {
@@ -171,8 +185,7 @@ const Dialogo = props => {
   
   
   return <Modal open={props.dialogoVisible} onExited={alCerrarse} keyboard enforceFocus
-    onEnter={
-      () => {
+    onEnter={() => {
         setNuevo(props.indiceEmpleadoActual !== -1)
         setEmpleado(props.indiceEmpleadoActual !== -1 
           ?{ ...props.empleados[props.indiceEmpleadoActual] } 
@@ -193,8 +206,7 @@ const Dialogo = props => {
           }
           :{}
         )
-      }
-    }
+    }}
   >
     {(() => {
         if (props.modoDialogo === "editar") {
@@ -231,7 +243,7 @@ const Dialogo = props => {
                 ,
               tipo: Schema.Types.StringType("Requerido").isRequired("Requerido")
             }
-          )
+        )
 
         return (
           <div>
@@ -303,8 +315,8 @@ const Dialogo = props => {
               </Form>
             </Modal.Body>
           </div>
-        )
-      }
+          )
+        }
         if (props.modoDialogo === "cambiarContraseña") {
           const _validadador = Schema.Model({
               token_celular: Schema.Types.StringType("Procure una contraseña segura")
@@ -366,8 +378,60 @@ const Dialogo = props => {
               </Form>
             </Modal.Body>
           </div>
-        )
-      }
+          )
+        }
+        if (props.modoDialogo === "eliminar") {
+          const _validadador = Schema.Model({})
+
+        return (<div>
+            <Modal.Title>Eliminar cuenta</Modal.Title>
+            <Modal.Body>
+              <Form style={props.style} ref={formulario}
+                formValue={empleado}
+                formError={erroresValidacion}
+                onChange={setEmpleado}
+                model={_validadador}
+                onCheck={(_erroresValidacion) => { 
+                    setErroresValidacion(_erroresValidacion)
+                  } 
+                }
+                onSubmit={() => guardar(empleado)}
+              >
+                <Form.Group controlId="id">
+                  <Form.ControlLabel>Número cédula</Form.ControlLabel>
+                  <Form.Control name="id" type="text" checkAsync autoComplete="off" 
+                    accepter={MaskedInput} placeholder="1234567890" errorPlacement="topEnd"
+                    placeholderChar="#"
+                    mask={[/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,]}
+                    plaintext
+                  />
+                </Form.Group>
+                <Form.Group controlId="nombre">
+                  <Form.ControlLabel>Nombre</Form.ControlLabel>
+                  <Form.Control name="nombre" type="text" checkAsync autoComplete="off" 
+                    errorPlacement="topEnd" plaintext
+                  />
+                </Form.Group>
+                <Message type="error" style={{ fontWeight: "bold" }}>
+                  La eliminación de un empleado eliminará todos sus datos. La acción es 
+                  IRREVERSIBLE.
+                </Message>
+                <Form.Group>
+                  <ButtonToolbar>
+                    <Button type="submit" appearance="primary" disabled={
+                      Object.entries(erroresValidacion).length !== 0
+                    }>
+                      Sí
+                    </Button>
+                    <Button appearance="default" onClick={() => props.setDialogoVisible(false)}>
+                      No
+                    </Button>
+                  </ButtonToolbar>
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+          </div>)
+        }
     })()}
   </Modal>
 }

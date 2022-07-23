@@ -12,5 +12,4 @@ export function notificar(message, options) {
         </Message>
         , { placement: options.placement || "topEnd" }
     )
-    console.log({message, options})
   }
