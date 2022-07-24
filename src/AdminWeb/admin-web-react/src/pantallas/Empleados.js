@@ -1,7 +1,7 @@
 import React, { useRef } from "react"
 import { Button, ButtonGroup, ButtonToolbar, Panel, Row, Col, Table, Grid, Modal, Form, Schema, MaskedInput, SelectPicker, Message } from "rsuite"
 import { notificar } from "../componentes/Notificaciones"
-import { hacerLlamadaApiInterna } from "../ultil"
+import { API_ROOT, hacerLlamadaApiInterna } from "../ultil"
 
 export const Empleados = () => {
   const TIPOS_EMPLEADOS = {
@@ -11,7 +11,8 @@ export const Empleados = () => {
 
   
   const [ empleados, setEmpleados ] = React.useState([])
-  const cargarEmpleados = () => hacerLlamadaApiInterna("GET", "empleado.php")  
+  {/* TODO Convertir en React Hook */}
+  const cargarEmpleados = () => hacerLlamadaApiInterna("GET", "empleado.php")
     .then(respuesta => {
       if (respuesta.status === "success") {
         const datos = respuesta.data.map(empleado => 
@@ -425,6 +426,61 @@ const Dialogo = props => {
                     </Button>
                     <Button appearance="default" onClick={() => props.setDialogoVisible(false)}>
                       No
+                    </Button>
+                  </ButtonToolbar>
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+          </div>)
+        }
+        if (props.modoDialogo === "registrarCelular") {
+          const _validadador = Schema.Model({})
+
+        return (<div>
+            <Modal.Title>Registrar celular</Modal.Title>
+            <Modal.Body>
+              <Form style={props.style} ref={formulario}
+                formValue={empleado}
+                formError={erroresValidacion}
+                onChange={setEmpleado}
+                model={_validadador}
+                onCheck={(_erroresValidacion) => { 
+                    setErroresValidacion(_erroresValidacion)
+                  } 
+                }
+                onSubmit={() => guardar(empleado)}
+              >
+                <Form.Group controlId="id">
+                  <Form.ControlLabel>Número cédula</Form.ControlLabel>
+                  <Form.Control name="id" type="text" checkAsync autoComplete="off" 
+                    accepter={MaskedInput} placeholder="1234567890" errorPlacement="topEnd"
+                    placeholderChar="#"
+                    mask={[/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,/\d/,]}
+                    plaintext
+                  />
+                </Form.Group>
+                <Form.Group controlId="nombre">
+                  <Form.ControlLabel>Nombre</Form.ControlLabel>
+                  <Form.Control name="nombre" type="text" checkAsync autoComplete="off" 
+                    errorPlacement="topEnd" plaintext
+                  />
+                </Form.Group>
+                {/* TODO Implementar una API que permita detectar cuando el teléfono se registra */}
+                <Message type="info">
+                  Para registrar un empleado, debe abrir la aplicación del empleado y escanear el 
+                  código QR que se muestra a continuación. Una vez aparezca el nombre de su empleado
+                  en la app, dé clic en <i>Aceptar</i>.
+                </Message>
+                <img 
+                  src={`${API_ROOT}codigo_qr_visual.php?render_empleado_id=${empleado.id}`}
+                  style={{
+                    maxWidth: "100%"
+                  }}
+                />
+                <Form.Group>
+                  <ButtonToolbar>
+                    <Button appearance="default" onClick={() => props.setDialogoVisible(false)}>
+                      Aceptar
                     </Button>
                   </ButtonToolbar>
                 </Form.Group>

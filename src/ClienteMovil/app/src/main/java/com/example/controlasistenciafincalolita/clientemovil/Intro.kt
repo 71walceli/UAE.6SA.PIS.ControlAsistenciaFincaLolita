@@ -115,12 +115,10 @@ class Intro : AppCompatActivity() {
                     val nuevaAsistencia = ModeloAsistencia(empleado.id, result.contents)
                     var response =
                         ControladorAsistencia.registrar(this, nuevaAsistencia)
-                    val mensaje =
-                        if (response.isSuccessful) "Se creó el registro de asistencia."
-                        else "Falló el registro de asistencia."
+                    val mensaje = JSONObject(response.peekBody(Long.MAX_VALUE).string())
+                        .getString("message")
                     ContextCompat.getMainExecutor(this).execute {
                         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-                        //estadoRegistroAsistencia = response.isSuccessful
                     }
                     if (response.isSuccessful) {
                         response = Api.hacerSolicitudApiServidor(

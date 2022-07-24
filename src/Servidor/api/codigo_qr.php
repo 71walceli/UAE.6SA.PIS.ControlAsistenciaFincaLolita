@@ -101,7 +101,7 @@ try {
     }
 } catch (mysqli_sql_exception $th) {
     http_response_code(500);
-    $response["mensaje"] = "Errur SQL";
+    $response["message"] = "Errur SQL";
     $response["sql"] = $sql;
     $response["sqlErrorCode"] = $mysql->errno;
     $response["sqlError"] = $mysql->error;

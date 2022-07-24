@@ -47,7 +47,7 @@ try {
 
             if ($result && $result->num_rows > 0) {
                 $response['status'] = 'success';
-                $response['mensaje'] = 'Inicio de sesión correcto';
+                $response['message'] = 'Inicio de sesión correcto';
                 $response["data"]= $result->fetch_all(MYSQLI_ASSOC)[0];
                 $result->free_result();
                 responder(200, $response);
@@ -55,7 +55,7 @@ try {
             else {
                 responder(400, array(
                     "status" => "Error",
-                    "mensaje" => "Credenciales incorrectas",
+                    "message" => "Credenciales incorrectas",
                 ));
             }
         }
@@ -245,7 +245,7 @@ try {
     }
 } catch (mysqli_sql_exception $th) {
     http_response_code(500);
-    $response["mensaje"] = "Errur SQL";
+    $response["message"] = "Errur SQL";
     $response["sql"] = $sql;
     $response["sqlErrorCode"] = $mysql->errno;
     $response["sqlError"] = $mysql->error;

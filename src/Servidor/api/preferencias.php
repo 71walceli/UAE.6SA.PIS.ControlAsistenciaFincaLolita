@@ -28,10 +28,8 @@ function procesarCedulaOResponderSiError($postBody) {
 try {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         # Validaciones
-        if (!verificarParametrosExistentes($postBody, array(
-            'nombre', 
-            "valor",
-            ))
+        // TODO Validar parámetro "valor", que solo sea cadena de texto.
+        if (!verificarParametrosExistentes($postBody, array('nombre'))
         ) {
             responder(400, array(
                 "status" => "error",
@@ -87,7 +85,7 @@ try {
     }
 } catch (mysqli_sql_exception $th) {
     http_response_code(500);
-    $response["mensaje"] = "Errur SQL";
+    $response["message"] = "Errur SQL";
     $response["sql"] = $sql;
     $response["sqlErrorCode"] = $mysql->errno;
     $response["sqlError"] = $mysql->error;

@@ -46,7 +46,7 @@ function cargarPreferenciasHoras($mysql) {
     $_datos = $datos;
 
     foreach ($datos as $key => $value) {
-        if (isset($datos[$key])) {
+        if (isset($datos[$key]) && $datos[$key] != "") {
             $_datos[$key] = new Hora($value);
         }
     }

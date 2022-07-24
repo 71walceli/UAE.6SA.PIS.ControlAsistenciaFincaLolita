@@ -36,7 +36,7 @@ try {
         else {
             $response = array();
             $response['status'] = 'error';
-            $response['message'] = 'Solo se aceptan peticiones POST o GET.';
+            $response['message'] = 'Solo se aceptan peticiones GET.';
             http_response_code(400);
             echo json_encode($response);
         }
@@ -51,7 +51,7 @@ try {
     }
 } catch (mysqli_sql_exception $th) {
     http_response_code(500);
-    $response["mensaje"] = "Errur SQL";
+    $response["message"] = "Errur SQL";
     $response["sql"] = $sql;
     $response["sqlErrorCode"] = $mysql->errno;
     $response["sqlError"] = $mysql->error;

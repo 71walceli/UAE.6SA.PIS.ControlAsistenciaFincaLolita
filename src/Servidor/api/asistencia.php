@@ -20,6 +20,58 @@ function procesarCedulaOResponderSiError($postBody) {
         exit();
     }
 }
+function verificarHorariosLaborales($horaActual) {
+    global $mysql;
+    // Comparar horas con los parámetros
+    $preferenciasHoras = cargarPreferenciasHoras($mysql);
+    return $horaActual->estaEnRango(
+            $preferenciasHoras["minHoraEntrada"],
+            $preferenciasHoras["maxHoraEntrada"],
+        )
+        ||
+        $horaActual->estaEnRango(
+            $preferenciasHoras["horaReceso"],
+            $preferenciasHoras["maxHoraReceso"],
+        )
+        ||
+        $horaActual->estaEnRango(
+            $preferenciasHoras["minHoraRecesoFin"],
+            $preferenciasHoras["maxHoraRecesoFin"],
+        )
+        ||
+        $horaActual->estaEnRango(
+            $preferenciasHoras["horaSalida"],
+            $preferenciasHoras["maxHoraSalida"],
+        );
+}
+function obtenerUltimoRangoHorasCumplido($horaActual, $preferenciasHoras) {
+    global $mysql;
+    $rangos = array(
+        array(
+            "inicio" => $preferenciasHoras["minHoraEntrada"],
+            "fin" => $preferenciasHoras["maxHoraEntrada"],
+        ),
+        array(
+            "inicio" => $preferenciasHoras["horaReceso"],
+            "fin" => $preferenciasHoras["maxHoraReceso"],
+        ),
+        array(
+            "inicio" => $preferenciasHoras["minHoraRecesoFin"],
+            "fin" => $preferenciasHoras["maxHoraRecesoFin"],
+        ),
+        array(
+            "inicio" => $preferenciasHoras["horaSalida"],
+            "fin" => $preferenciasHoras["maxHoraSalida"],
+        ),
+    );
+
+    foreach ($rangos as $rango) {
+        if ($horaActual->estaEnRango($rango["inicio"], $rango["fin"])) {
+            return $rango;
+        }
+    }
+    return null;
+}
 
 # API
 try {
@@ -103,7 +155,7 @@ try {
             else {
                 responder(400, array(
                     "status" => "error",
-                    "mensaje" => "Registro de asistencia no disponible en este horario.",
+                    "message" => "Registro de asistencia no disponible fuera de horario laboral.",
                 ));
             }
         }
@@ -294,7 +346,7 @@ try {
     }
 } catch (mysqli_sql_exception $th) {
     http_response_code(500);
-    $response["mensaje"] = "Errur SQL";
+    $response["message"] = "Errur SQL";
     $response["sql"] = $sql;
     $response["sqlErrorCode"] = $mysql->errno;
     $response["sqlError"] = $mysql->error;
