@@ -18,5 +18,4 @@ yarn-error.log*
 /.changelog
 .npm/
 
-
-
+src/AdminWeb/admin-web-react/src/pantallas/LandingPage/js/*
