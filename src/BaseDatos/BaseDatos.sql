@@ -61,6 +61,18 @@ BEGIN
         ORDER BY asistencia.fecha_hora DESC
         LIMIT 1;
 END\\
+CREATE PROCEDURE asistencias_empleado_en_rango (
+	IN _emoleado_id BIGINT,
+    IN _fecha_hora_min DATETIME,
+    IN _fecha_hora_max DATETIME
+)
+BEGIN
+	SELECT * FROM asistencia_vista 
+		WHERE 
+			_fecha_hora_min < asistencia_fecha_hora 
+            AND asistencia_fecha_hora < _fecha_hora_max
+		ORDER BY asistencia_fecha_hora;
+END\\
 DELIMITER ;
 
 
