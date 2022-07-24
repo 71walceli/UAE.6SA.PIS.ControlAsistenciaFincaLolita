@@ -7,7 +7,8 @@ require_once("../lib/phpqrcode/qrlib.php");
 # API
 try {
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        if ($_SERVER['QUERY_STRING'] == "render_ultimo_qr") {
+        // TODO Tomar en cuenta parámetro para fecha
+        if (isset($queryParams["ultimo_qr"])) {
             $sql = "SELECT * FROM codigo_qr_vista_ultimo";
             $result = $mysql->query($sql);
             //$response['status'] = 'success';
