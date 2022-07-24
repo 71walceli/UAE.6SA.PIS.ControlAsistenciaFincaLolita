@@ -83,18 +83,17 @@ export const Empleados = () => {
                 Editar
               </Button>
               {/*TODO Pendiente de implementar eventos de click*/}
-              <Button appearance="ghost" style={estilosBotones} onClick={ 
-                () => mostrarDialogo("cambiarContraseña", indiceEmpleado)
-              }>
-                Cambiar contraseña
-              </Button>
               {empleado.tipo === "j" 
                 ?<Button appearance="ghost" style={estilosBotones} onClick={
                   () => mostrarDialogo("registrarCelular", indiceEmpleado)
                 }>
                   Registrar celular
                 </Button>
-                : null
+                :<Button appearance="ghost" style={estilosBotones} onClick={ 
+                  () => mostrarDialogo("cambiarContraseña", indiceEmpleado)
+                }>
+                  Cambiar contraseña
+                </Button>
               }
               <Button appearance="ghost" color="red" onClick={
                 () => mostrarDialogo("eliminar", indiceEmpleado)
