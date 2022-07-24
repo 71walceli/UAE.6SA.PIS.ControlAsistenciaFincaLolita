@@ -43,6 +43,8 @@
         - [ ] Req6. Como administrador, necesito que los códigos QR se generen por cada momento de marcado, con el fin de mitigar la posibilidad de fraude.
         - [ ] Req7. Como administrador, necesito poder justificar inasistencias, con el fin de tener en cuenta feriados o situaciones de fuerza mayor.
         - [x] Req8. Como administrador, necesito poder realizar la asistencia solo en la red inalámbrica de la finca, con el fin de que puedan registrar la asistencia solo los empleados que están.
+    - [ ] Requerimientos no funcionales
+        - [x] Inicio de sesión para administradores a través de la Web
 
 # Casos de uso
 - [ ] Uso1: Registro de jornaleros
