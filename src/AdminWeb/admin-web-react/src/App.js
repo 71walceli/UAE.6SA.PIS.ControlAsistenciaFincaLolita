@@ -5,6 +5,7 @@ import { notificar } from "./componentes/Notificaciones";
 import { Empleados } from "./pantallas/Empleados";
 import { LandingPage } from "./pantallas/LandingPage";
 import { InicioSesión } from "./pantallas/Login";
+import { MostrarCodigoQr } from "./pantallas/MostrarCodigoQr";
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
         height: "100%",
         marginLeft: "2vw",
         marginRight: "2vw",
+        backgroundColor: "#ffffff",
       }}
     >
       <Navbar>
@@ -49,9 +51,10 @@ function App() {
           <Nav.Item href="/">Inicio</Nav.Item>
           {credenciales 
             ? [
+                <Nav.Item key="0" href="/codigo_qr">Mostrar código QR</Nav.Item>,
                 <Nav.Item key="1" href="/empleados">Empleados</Nav.Item>,
-                <Nav.Item key="2">Reportes</Nav.Item>,
-                <Nav.Item key="3">Configuración</Nav.Item>,
+                <Nav.Item key="2" href="/reportes">Reportes</Nav.Item>,
+                <Nav.Item key="3" href="/configuracion">Configuración</Nav.Item>,
               ]
             : null
             }
@@ -59,8 +62,8 @@ function App() {
         <Nav pullRight>
           {credenciales 
             ? [
-                <Nav.Item key="1" disabled>{ credenciales.nombre }</Nav.Item>,
-                <Nav.Item key="2" 
+                <Nav.Item key="0" disabled>{ credenciales.nombre }</Nav.Item>,
+                <Nav.Item key="1" 
                   onClick={() => {
                     setCredenciales(null)}
                   }
@@ -77,6 +80,11 @@ function App() {
           <Routes>
             <Route path="/" 
               element={<LandingPage />} 
+            />
+            <Route path="/codigo_qr" 
+              element={<MostrarCodigoQr
+                credenciales={credenciales} setCredenciales={setCredenciales} 
+              />} 
             />
             <Route path="/inicio_sesion" 
               element={<InicioSesión 
