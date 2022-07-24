@@ -92,36 +92,130 @@ try {
             }
             procesarCedulaOResponderSiError($postBody);
 
-            // Comparar horas con los parámetros
             $preferenciasHoras = cargarPreferenciasHoras($mysql);
-            $horaActual = $preferenciasHoras["horaRegistroAsistencia"];
-            $horaFechaActual = isset($horaActual) 
-                ? "'".date("Y-m-d ").$horaActual."'" : "now()";
-            //throw new Error(var_export($preferenciasHoras));
-
             // TODO Pendiente validar que solo se pueda registrar una asistencia durante los 
-            //  rangos de tiemppo.
-            if (
-                $horaActual->estaEnRango(
-                    $preferenciasHoras["minHoraEntrada"],
-                    $preferenciasHoras["maxHoraEntrada"],
-                )
-                ||
-                $horaActual->estaEnRango(
-                    $preferenciasHoras["horaReceso"],
-                    $preferenciasHoras["maxHoraReceso"],
-                )
-                ||
-                $horaActual->estaEnRango(
-                    $preferenciasHoras["minHoraRecesoFin"],
-                    $preferenciasHoras["maxHoraRecesoFin"],
-                )
-                ||
-                $horaActual->estaEnRango(
-                    $preferenciasHoras["horaSalida"],
-                    $preferenciasHoras["maxHoraSalida"],
-                )
-            ) {
+            //  rangos de tiempo, una única vez.
+            $horaActual = $preferenciasHoras["horaRegistroAsistencia"] != "" 
+                ? $preferenciasHoras["horaRegistroAsistencia"] 
+                : new Hora(date("H:i"));
+            $horaFechaActual = "'".date("Y-m-d ").$horaActual."'";
+
+            $intervaloHoras = obtenerUltimoRangoHorasCumplido($horaActual, $preferenciasHoras);
+            if ($intervaloHoras != null) {
+                // Buscar si se registró una asistencia anteriormente
+                $sql = "SELECT * FROM asistencia_vista 
+                    WHERE 
+                        empleado_id='".mysqli_escape_string($mysql, $postBody["empleado_id"])."'
+                        AND '".mysqli_escape_string($mysql, date("Y-m-d ").$intervaloHoras["inicio"])."' 
+                            < asistencia_fecha_hora 
+                        AND asistencia_fecha_hora 
+                            < '".mysqli_escape_string($mysql, date("Y-m-d ").$intervaloHoras["fin"])."'
+                    ORDER BY asistencia_fecha_hora;";
+                $result = $mysql->query($sql);
+                
+                if ($result && $result->num_rows > 0) {
+                    responder(200, array(
+                        "status" => "success",
+                        "message" => "Unted ya registró su asistencia previamente. Ya no es necesario.",
+                    ));
+                } 
+                else {
+                    $result->free_result();
+                    $sql = "INSERT INTO $tabla(
+                                    empleado_id, 
+                                    codigo_qr_id, 
+                                    fecha_hora,
+                                    observacion
+                                ) VALUES (
+                                    '".mysqli_escape_string($mysql, $postBody["empleado_id"])."', 
+                                    (SELECT id FROM codigo_qr WHERE token=unhex(
+                                        '".mysqli_escape_string($mysql, $postBody["codigo_qr_token"])."'
+                                    )), 
+                                    ".$horaFechaActual.", 
+                                    '' 
+                                )";
+                    
+                    $result = $mysql->query($sql);
+    
+                    if ($result) {
+                        responder(200, array(
+                            "status" => "success",
+                            "message" => "Registro de $tabla guardado correctamente"
+                        ));
+                    } else {
+                        responder(400, array(
+                            "status" => "error",
+                            "message" => "Error al guardar registro de $tabla",
+                            "mysql_error" => $mysql->error,
+                            "mysql_errno" => $mysql->errno,
+                        ));
+                    }
+                }
+            }
+            else {
+                responder(400, array(
+                    "status" => "error",
+                    "message" => "Registro de asistencia no disponible fuera de horario laboral.",
+                ));
+            }
+        } else {
+            // Buscar si existe
+            $sql = "SELECT id 
+                FROM $tabla
+                WHERE id='".mysqli_escape_string($mysql, $postBody['id'])."'";
+            $result = $mysql->query($sql);
+    
+            if ($result && $result->num_rows > 0) {
+                # Validaciones
+                if (!verificarParametrosExistentes($postBody, array(
+                        'id', 
+                        "fecha_hora",
+                        "observacion",
+                    ))
+                ) {
+                    $response = array(
+                        "status" => "error",
+                        "message" => "Campos requeridos faltantes."
+                    );
+                    http_response_code(400);
+                    echo json_encode($response);
+                    exit();
+                }
+                
+                // Actualizar si el registro existe
+                $sql = "UPDATE $tabla 
+                            SET 
+                                fecha_hora='".mysqli_escape_string($mysql, $postBody["fecha_hora"])."',
+                                observacion='".mysqli_escape_string($mysql, $postBody["observacion"])."'
+                            WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
+            } 
+            else {
+                // TODO Crear una nueva asistencia desde el celular deba requerir la contraseña.
+                if (!verificarParametrosExistentes($postBody, array(
+                        'empleado_id', 
+                        "codigo_qr_token", 
+                        "observacion",
+                    ))
+                ) {
+                    $response = array(
+                        "status" => "error",
+                        "message" => "Campos requeridos faltantes."
+                    );
+                    http_response_code(400);
+                    echo json_encode($response);
+                    exit();
+                }
+                procesarCedulaOResponderSiError($postBody);
+    
+                if (!isset($postBody["fecha_hora"])) {
+                    $fecha_hora = "now()";
+                } else {
+                    $fecha_hora = "'".
+                        mysqli_escape_string($mysql, $postBody["fecha_hora"])
+                    ."'";
+                }
+    
+                // Si no existe, agregarlo
                 $sql = "INSERT INTO $tabla(
                                 empleado_id, 
                                 codigo_qr_id, 
@@ -132,122 +226,29 @@ try {
                                 (SELECT id FROM codigo_qr WHERE token=unhex(
                                     '".mysqli_escape_string($mysql, $postBody["codigo_qr_token"])."'
                                 )), 
-                                ".$horaFechaActual.", 
-                                '' 
+                                $fecha_hora, 
+                                '".mysqli_escape_string($mysql, $postBody["observacion"])."' 
                             )";
-                
-                $result = $mysql->query($sql);
-
-                if ($result) {
-                    responder(200, array(
-                        "status" => "success",
-                        "message" => "Registro de $tabla guardado correctamente"
-                    ));
-                } else {
-                    responder(400, array(
-                        "status" => "error",
-                        "message" => "Error al guardar registro de $tabla",
-                        "mysql_error" => $mysql->error,
-                        "mysql_errno" => $mysql->errno,
-                    ));
-                }
             }
-            else {
-                responder(400, array(
-                    "status" => "error",
-                    "message" => "Registro de asistencia no disponible fuera de horario laboral.",
-                ));
-            }
-        }
-        // Buscar si existe
-        $sql = "SELECT id 
-            FROM $tabla
-            WHERE id='".mysqli_escape_string($mysql, $postBody['id'])."'";
-        $result = $mysql->query($sql);
-
-        if ($result && $result->num_rows > 0) {
-            # Validaciones
-            if (!verificarParametrosExistentes($postBody, array(
-                    'id', 
-                    "fecha_hora",
-                    "observacion",
-                ))
-            ) {
+            $result = $mysql->query($sql);
+    
+            if ($result) {
                 $response = array(
-                    "status" => "error",
-                    "message" => "Campos requeridos faltantes."
+                    "status" => "success",
+                    "message" => "Registro de $tabla guardado correctamente"
                 );
-                http_response_code(400);
+                http_response_code(200);
                 echo json_encode($response);
-                exit();
-            }
-            
-            // Actualizar si el registro existe
-            $sql = "UPDATE $tabla 
-                        SET 
-                            fecha_hora='".mysqli_escape_string($mysql, $postBody["fecha_hora"])."',
-                            observacion='".mysqli_escape_string($mysql, $postBody["observacion"])."'
-                        WHERE id='".mysqli_escape_string($mysql, $postBody["id"])."'";
-        } 
-        else {
-            // TODO Crear una nueva asistencia desde el celular deba requerir la contraseña.
-            if (!verificarParametrosExistentes($postBody, array(
-                    'empleado_id', 
-                    "codigo_qr_token", 
-                    "observacion",
-                ))
-            ) {
-                $response = array(
-                    "status" => "error",
-                    "message" => "Campos requeridos faltantes."
-                );
-                http_response_code(400);
-                echo json_encode($response);
-                exit();
-            }
-            procesarCedulaOResponderSiError($postBody);
-
-            if (!isset($postBody["fecha_hora"])) {
-                $fecha_hora = "now()";
             } else {
-                $fecha_hora = "'".
-                    mysqli_escape_string($mysql, $postBody["fecha_hora"])
-                ."'";
+                $response = array(
+                    "status" => "error",
+                    "message" => "Error al guardar registro de $tabla",
+                    "mysql_error" => $mysql->error,
+                    "mysql_errno" => $mysql->errno,
+                );
+                http_response_code(400);
+                echo json_encode($response);
             }
-
-            // Si no existe, agregarlo
-            $sql = "INSERT INTO $tabla(
-                            empleado_id, 
-                            codigo_qr_id, 
-                            fecha_hora,
-                            observacion
-                        ) VALUES (
-                            '".mysqli_escape_string($mysql, $postBody["empleado_id"])."', 
-                            (SELECT id FROM codigo_qr WHERE token=unhex(
-                                '".mysqli_escape_string($mysql, $postBody["codigo_qr_token"])."'
-                            )), 
-                            $fecha_hora, 
-                            '".mysqli_escape_string($mysql, $postBody["observacion"])."' 
-                        )";
-        }
-        $result = $mysql->query($sql);
-
-        if ($result) {
-            $response = array(
-                "status" => "success",
-                "message" => "Registro de $tabla guardado correctamente"
-            );
-            http_response_code(200);
-            echo json_encode($response);
-        } else {
-            $response = array(
-                "status" => "error",
-                "message" => "Error al guardar registro de $tabla",
-                "mysql_error" => $mysql->error,
-                "mysql_errno" => $mysql->errno,
-            );
-            http_response_code(400);
-            echo json_encode($response);
         }
     } 
     else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
