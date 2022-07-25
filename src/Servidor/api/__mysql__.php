@@ -1,5 +1,5 @@
 <?php
-$mysql = new mysqli("10.255.255.241", "control_asistencia_finca_lolita", 
+$mysql = new mysqli("localhost", "control_asistencia_finca_lolita", 
     "1234567890abcdef", "control_asistencia_finca_lolita");
 
 define("contrasenia_sal_inicio", "54L");
