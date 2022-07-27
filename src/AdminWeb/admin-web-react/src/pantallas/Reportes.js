@@ -5,6 +5,7 @@ import {
 } from "rsuite";
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import moment from 'moment';
 
 import { useAsistencia } from "../componentes/Hooks/useAsistencias";
 import { useEmpleados } from "../componentes/Hooks/useEmpleados";
@@ -31,13 +32,6 @@ export const Reportes = props => {
   }
 
   const obtenerAsistenciaDeEmpleado = (empleado, anioMes) => {
-    // TODO Reconsiderar forma de obtener los rangos de tiempo
-    // TODO Hacer función para que genere los datos de reporte de un solo empleado
-    const minHoraEntrada = preferencias.filter(p => p.nombre === "minHoraEntrada")[0].valor
-    const maxHoraReceso = preferencias.filter(p => p.nombre === "maxHoraReceso")[0].valor
-    const minHoraRecesoFin = preferencias.filter(p => p.nombre === "minHoraRecesoFin")[0].valor
-    const maxHoraSalida = preferencias.filter(p => p.nombre === "maxHoraSalida")[0].valor
-
     const asistenciasPorFecha = asistencias
       .filter(asistencia => 
         asistencia.empleado_id === empleado.id
@@ -54,31 +48,57 @@ export const Reportes = props => {
     for (let fecha in asistenciasPorFecha) {
       const asistenciasManiana = asistenciasPorFecha[fecha]
         .filter(asistencia =>
-          minHoraEntrada.localeCompare(asistencia.asistencia_fecha_hora.substring(11)) < 0
-          && maxHoraReceso.localeCompare(asistencia.asistencia_fecha_hora.substring(11)) > 0
+          preferencias.minHoraEntrada
+            .localeCompare(asistencia.asistencia_fecha_hora.substring(11)) < 0
+          && preferencias.maxHoraReceso
+            .localeCompare(asistencia.asistencia_fecha_hora.substring(11)) > 0
         )
       const asistenciasTarde = asistenciasPorFecha[fecha]
         .filter(asistencia =>
-          minHoraRecesoFin.localeCompare(asistencia.asistencia_fecha_hora.substring(11)) < 0
-          && maxHoraSalida.localeCompare(asistencia.asistencia_fecha_hora.substring(11)) > 0
+          preferencias.minHoraRecesoFin
+            .localeCompare(asistencia.asistencia_fecha_hora.substring(11)) < 0
+          && preferencias.maxHoraSalida
+            .localeCompare(asistencia.asistencia_fecha_hora.substring(11)) > 0
         )
+      // TODO Manejar variables genéricas
       asistenciasPorJornada.push({
         fecha,
-        manianainicio: asistenciasManiana.length > 0 
+        manianaInicio: asistenciasManiana.length > 0 
           ? asistenciasManiana[0].asistencia_fecha_hora.substring(11)
           : null,
-        manianafin: asistenciasManiana.length > 1 
+        manianaFin: asistenciasManiana.length > 1 
           ? asistenciasManiana[asistenciasManiana.length - 1].asistencia_fecha_hora.substring(11)
           : null,
-        tardeinicio: asistenciasTarde.length > 0 
+        tardeInicio: asistenciasTarde.length > 0 
           ? asistenciasTarde[0].asistencia_fecha_hora.substring(11)
           : null,
-        tardefin: asistenciasTarde.length > 1 
+        tardeFin: asistenciasTarde.length > 1 
           ? asistenciasTarde[asistenciasTarde.length - 1].asistencia_fecha_hora.substring(11)
           : null,
+        retrasos: [
+          asistenciasManiana.length > 0 
+            ? asistenciasManiana[0].asistencia_fecha_hora.substring(11)
+              .localeCompare(preferencias.horaEntrada) > 0
+            : true
+          ,
+          asistenciasManiana.length > 1 
+            ? asistenciasManiana[asistenciasManiana.length - 1].asistencia_fecha_hora.substring(11)
+              .localeCompare(preferencias.horaReceso) < 0
+            : true
+          ,
+          asistenciasTarde.length > 0 
+            ? asistenciasTarde[0].asistencia_fecha_hora.substring(11)
+              .localeCompare(preferencias.horaRecesoFin) > 0
+            : true
+          ,
+          asistenciasTarde.length > 1 
+            ? asistenciasTarde[asistenciasTarde.length - 1].asistencia_fecha_hora.substring(11)
+              .localeCompare(preferencias.horaSalida) < 0
+            : true
+          ,]
       })
     }
-    return asistenciasPorJornada
+    return asistenciasPorJornada.reverse()
   }
 
   useEffect(() => {
@@ -94,8 +114,33 @@ export const Reportes = props => {
       .map(empleado => ({
         id: empleado.id,
         nombre: empleado.nombre,
-        asistencias: obtenerAsistenciaDeEmpleado(empleado, anioMes)
+        asistencias: obtenerAsistenciaDeEmpleado(empleado, anioMes),
       }))
+      .map(empleado => ({
+        ...empleado,
+        cantidadRetrasus: empleado.asistencias.reduce((valorAnterior, registroActual) => 
+          registroActual.retrasos.map(valor => valor ? 1 : 0 )
+            .reduce((anterior, actual) => anterior+actual, 0) 
+          + valorAnterior, 0),
+        // TODO Organizar mejor el código
+        cantidadInasistencias: empleado.asistencias.reduce((valorAnterior, registroActual) => (
+            Number(!registroActual.manianaInicio && !registroActual.manianaFin)
+              + Number(!registroActual.tardeInicio && !registroActual.tardeFin)
+              + valorAnterior), 0 
+          ),
+        horasTotalesTrabajadas: empleado.asistencias
+          .reduce((valorAnterior, registroActual) => {
+            return (
+              moment.duration(registroActual.manianaFin, "HH:mm")
+                .subtract(moment.duration(registroActual.manianaInicio, "HH:mm"))
+                .add(moment.duration(registroActual.tardeFin, "HH:mm")
+                  .subtract(moment.duration(registroActual.tardeInicio, "HH:mm"))
+                )
+                .add(valorAnterior))
+          }, moment.duration("00:00", "HH:mm")
+      ).format("HH:mm").toString(),
+      }))
+      console.log(empleadoAsistencia)
     setDatosReporte(empleadoAsistencia)
   }, [asistencias, preferencias, empleados, parametrosReporte])
 
@@ -161,6 +206,7 @@ const ReporteGeneral = props => {
 const ReporteInEmpleado = props => {
   const [ listo, setListo ] = React.useState(false)
   const [ datos, setDatos ] = React.useState()
+  const [ preferencias ] = usePreferencias()
 
   React.useEffect(() => {
     const _listo = props.empleadoId && props.datosReporte
@@ -170,34 +216,86 @@ const ReporteInEmpleado = props => {
       return
     }
     const _datos = props.datosReporte
-      .filter(empleado => empleado.id === props.empleadoId)[0].asistencias
+      .filter(empleado => empleado.id === props.empleadoId)[0]
     setDatos(_datos)
   }, [props.empleadoId, props.datosReporte])
 
   return (<div>
     {(listo)
-      ?<Table>
-        <Thead>
-          <Tr>
-            <Th>Día</Th>
-            <Th>Entrada</Th>
-            <Th>Inicio Receso</Th>
-            <Th>Fin Receso</Th>
-            <Th>Salida</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {datos && datos.map(fila => (
-            <Tr key={fila.fecha}>
-              <Td>{ fila.fecha }</Td>
-              <Td>{ fila.manianainicio }</Td>
-              <Td>{ fila.manianafin }</Td>
-              <Td>{ fila.tardeinicio }</Td>
-              <Td>{ fila.tardefin }</Td>
+      ?<div>
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Día</Th>
+              <Th>Entrada</Th>
+              <Th>Inicio Receso</Th>
+              <Th>Fin Receso</Th>
+              <Th>Salida</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {datos && datos.asistencias.map(fila => (
+              <Tr key={fila.fecha}>
+                <Td style={{ 
+                  fontWeight: "bold"
+                }} >{ fila.fecha }</Td>
+                {fila.manianaInicio
+                  ?<Td 
+                    style={{ 
+                      color: 
+                        fila.manianaInicio.localeCompare(preferencias.horaEntrada) < 0 ? "green" : "red"
+                    }}
+                  >{ fila.manianaInicio }</Td>
+                  :<Td>---</Td>
+                }
+                {fila.manianaFin
+                  ?<Td 
+                    style={{ 
+                      color: 
+                        fila.manianaFin.localeCompare(preferencias.horaReceso) > 0 ? "green" : "red"
+                    }}
+                  >{ fila.manianaFin }</Td>
+                  :<Td>---</Td>
+                }
+                {fila.tardeInicio
+                  ?<Td 
+                    style={{ 
+                      color: 
+                        fila.tardeInicio.localeCompare(preferencias.horaRecesoFin) < 0 ? "green" : "red"
+                    }}
+                  >{ fila.tardeInicio }</Td>
+                  :<Td>---</Td>
+                }
+                {fila.tardeFin
+                  ?<Td 
+                    style={{ 
+                      color: 
+                        fila.tardeFin.localeCompare(preferencias.horaSalida) > 0 ? "green" : "red"
+                    }}
+                  >{ fila.tardeFin }</Td>
+                  :<Td>---</Td>
+                }
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Retrasos o Salidas anticipadas</Th>
+              <Th>Inasistencias</Th>
+              <Th>Horas Trabajadas</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{ datos.cantidadRetrasus }</Td>
+              <Td>{ datos.cantidadInasistencias }</Td>
+              <Td>{ datos.horasTotalesTrabajadas }</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </div>
       :"Cargando..."
     }
   </div>)
