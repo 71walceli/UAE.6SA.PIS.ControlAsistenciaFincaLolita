@@ -9,7 +9,8 @@ export const usePreferencias = () => {
   const recargar = async () => {
     await (hacerLlamadaApiInterna("GET", API_ENDPOINT)
       .then(data => {
-        setPreferencias([ ...data.data ])
+        setPreferencias(data.data.map(p => ({[p.nombre]: p.valor})))
+        console.log(data.data.map(p => ({[p.nombre]: p.valor})))
       }))
   }
 
